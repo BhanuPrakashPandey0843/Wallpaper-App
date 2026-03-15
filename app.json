@@ -4,6 +4,7 @@
     "slug": "Faithframes",
     "version": "1.0.0",
     "orientation": "portrait",
+    "scheme": "faithframes",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
@@ -25,6 +26,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "plugins": [
+      "expo-router",
+      "expo-image",
+      "expo-font"
+    ]
   }
 }

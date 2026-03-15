@@ -1,0 +1,86 @@
+import React, { useCallback } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Image } from 'expo-image';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { radius } from '../../theme/radius';
+import { spacing } from '../../theme/spacing';
+import { colors } from '../../theme/colors';
+import Text from '../ui/Text';
+import * as Haptics from 'expo-haptics';
+
+interface Props {
+  title: string;
+  image: { thumb?: string; uri: string; blurhash?: string };
+  onPress: () => void;
+  width: number;
+  height: number;
+  loading?: boolean;
+}
+
+export const StoryCard: React.FC<Props> = React.memo(({ title, image, onPress, width, height, loading }) => {
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+
+  const onPressIn = () => {
+    scale.value = withSpring(0.96, { damping: 15 });
+  };
+  const onPressOut = () => {
+    scale.value = withSpring(1, { damping: 15 });
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const handlePress = useCallback(onPress, [onPress]);
+
+  return (
+    <Pressable onPress={handlePress} onPressIn={onPressIn} onPressOut={onPressOut} style={styles.root}>
+      <Animated.View style={[animatedStyle]}>
+        <View style={[styles.imageWrap, { width, height, borderRadius: radius.lg }]}>
+          <Image
+            source={{ uri: image.uri }}
+            placeholder={image.blurhash}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            style={{ width, height, borderRadius: radius.lg }}
+          />
+          <View style={[styles.overlay, { borderRadius: radius.lg }]}>
+            <View style={styles.gradient} />
+            <Text variant="sm" bold style={styles.overlayTitle} numberOfLines={1}>
+              {title}
+            </Text>
+          </View>
+        </View>
+      </Animated.View>
+    </Pressable>
+  );
+});
+
+const styles = StyleSheet.create({
+  root: {
+    marginRight: spacing.md,
+  },
+  imageWrap: {
+    overflow: 'hidden',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.glassBorder,
+    backgroundColor: colors.surfaceElevated,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'flex-end',
+  },
+  gradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 80,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
+  overlayTitle: {
+    color: colors.textPrimary,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.sm,
+  },
+});
+
+export default StoryCard;
