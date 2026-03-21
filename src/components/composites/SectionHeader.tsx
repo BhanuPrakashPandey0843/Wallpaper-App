@@ -13,7 +13,7 @@ interface Props {
 export const SectionHeader: React.FC<Props> = React.memo(({ title, onActionPress, actionLabel }) => {
   return (
     <View style={styles.row} accessibilityRole="header">
-      <Text variant="lg" bold>
+      <Text variant="lg" bold style={{ color: '#FFF', fontSize: 20 }}>
         {title}
       </Text>
       {onActionPress && actionLabel ? <Button title={actionLabel} onPress={onActionPress} variant="surface" /> : null}

@@ -1,8 +1,7 @@
 import React from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Text from '../../ui/Text';
-import { styles } from './styles';
-import { MotiView } from 'moti';
+import { colors } from '../../../theme/colors';
 
 interface Props {
   title: string;
@@ -11,23 +10,28 @@ interface Props {
 
 export const HeaderTitle: React.FC<Props> = React.memo(({ title, subtitle }) => {
   return (
-    <MotiView
-      from={{ opacity: 0, translateY: 6 }}
-      animate={{ opacity: 1, translateY: 0 }}
-      transition={{ type: 'timing', duration: 250 }}
-    >
-      <View style={styles.left}>
-        <Text variant="xl" bold style={styles.title} accessibilityLabel={title}>
-          {title}
+    <View>
+      <Text variant="h3" bold style={styles.title}>
+        {title}
+      </Text>
+      {subtitle && (
+        <Text variant="xs" style={styles.subtitle}>
+          {subtitle}
         </Text>
-        {subtitle ? (
-          <Text variant="sm" color="textSecondary" accessibilityLabel={subtitle}>
-            {subtitle}
-          </Text>
-        ) : null}
-      </View>
-    </MotiView>
+      )}
+    </View>
   );
+});
+
+const styles = StyleSheet.create({
+  title: {
+    color: colors.textPrimary,
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    color: colors.textSecondary,
+    marginTop: -2,
+  },
 });
 
 export default HeaderTitle;

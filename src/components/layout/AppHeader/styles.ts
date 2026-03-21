@@ -5,14 +5,10 @@ import { radius } from '../../../theme/radius';
 
 export const styles = StyleSheet.create({
   container: {
-    marginHorizontal: spacing.md,
-    marginTop: spacing.md,
-    backgroundColor: colors.glass,
-    borderRadius: radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.glassBorder,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md, // Align with the rest of the app content
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
+    backgroundColor: '#0F0F0F', // Match CategoriesSection background
   },
   row: {
     flexDirection: 'row',

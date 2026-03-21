@@ -10,7 +10,7 @@ import * as Haptics from 'expo-haptics';
 
 interface Props {
   title: string;
-  image: { thumb?: string; uri: string; blurhash?: string };
+  image: any;
   onPress: () => void;
   width: number;
   height: number;
@@ -34,21 +34,17 @@ export const StoryCard: React.FC<Props> = React.memo(({ title, image, onPress, w
   return (
     <Pressable onPress={handlePress} onPressIn={onPressIn} onPressOut={onPressOut} style={styles.root}>
       <Animated.View style={[animatedStyle]}>
-        <View style={[styles.imageWrap, { width, height, borderRadius: radius.lg }]}>
+        <View style={[styles.imageWrap, { width, height, borderRadius: 24 }]}>
           <Image
-            source={{ uri: image.uri }}
-            placeholder={image.blurhash}
+            source={image}
             contentFit="cover"
             cachePolicy="memory-disk"
-            style={{ width, height, borderRadius: radius.lg }}
+            style={{ width, height, borderRadius: 24 }}
           />
-          <View style={[styles.overlay, { borderRadius: radius.lg }]}>
-            <View style={styles.gradient} />
-            <Text variant="sm" bold style={styles.overlayTitle} numberOfLines={1}>
-              {title}
-            </Text>
-          </View>
         </View>
+        <Text variant="xs" bold style={styles.cardTitle} numberOfLines={2}>
+          {title}
+        </Text>
       </Animated.View>
     </Pressable>
   );
@@ -57,29 +53,16 @@ export const StoryCard: React.FC<Props> = React.memo(({ title, image, onPress, w
 const styles = StyleSheet.create({
   root: {
     marginRight: spacing.md,
+    width: 160,
   },
   imageWrap: {
     overflow: 'hidden',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.glassBorder,
     backgroundColor: colors.surfaceElevated,
+    marginBottom: spacing.xs,
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'flex-end',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 80,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-  },
-  overlayTitle: {
+  cardTitle: {
     color: colors.textPrimary,
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.sm,
+    marginTop: 4,
   },
 });
 

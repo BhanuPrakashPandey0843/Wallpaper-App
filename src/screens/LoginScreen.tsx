@@ -88,6 +88,7 @@ export default function LoginScreen() {
           <AnimatedPressable
             onPressIn={onPressIn}
             onPressOut={onPressOut}
+            onPress={() => router.replace("/(tabs)")}
             style={[styles.primaryButton, buttonAnim]}
           >
             <Text style={styles.primaryText}>SIGN IN</Text>

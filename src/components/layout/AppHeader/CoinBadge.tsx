@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Star } from 'lucide-react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSequence, withSpring } from 'react-native-reanimated';
 import Text from '../../ui/Text';
 import { colors } from '../../../theme/colors';
@@ -28,9 +28,8 @@ export const CoinBadge: React.FC<Props> = React.memo(({ coins, multiplier, premi
     if (coins > prev.current) {
       scale.value = withSequence(withSpring(1.2, { damping: 12 }), withSpring(1, { damping: 12 }));
       glow.value = withSpring(0.35, { damping: 20 });
-      glow.value = withSpring(0.15, { damping: 20 });
+      glow.value = withSequence(withSpring(0.35, { damping: 20 }), withSpring(0.15, { damping: 20 }));
     } else if (coins < prev.current) {
-      // subtle red flash could be added; keep performance-friendly
       scale.value = withSpring(0.98, { damping: 12 });
       scale.value = withSpring(1, { damping: 12 });
     }
@@ -39,18 +38,12 @@ export const CoinBadge: React.FC<Props> = React.memo(({ coins, multiplier, premi
 
   return (
     <Animated.View accessibilityLabel={accessibleLabel} style={[styles.root, animatedStyle]}>
-      <LinearGradient colors={[colors.goldStart, colors.goldEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.gradient}>
-        <Text variant="sm" bold>
-          {coins}
+      <View style={styles.badge}>
+        <Star size={14} color="#000" fill="#000" />
+        <Text variant="sm" bold style={styles.text}>
+          {String(coins).padStart(2, '0')}
         </Text>
-        {multiplier ? (
-          <View style={styles.mult}>
-            <Text variant="xs" bold>
-              x{multiplier}
-            </Text>
-          </View>
-        ) : null}
-      </LinearGradient>
+      </View>
     </Animated.View>
   );
 });
@@ -59,23 +52,18 @@ const styles = StyleSheet.create({
   root: {
     minHeight: 32,
     borderRadius: radius.pill,
+    backgroundColor: colors.warning,
     overflow: 'hidden',
-    shadowColor: colors.goldStart,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 0 },
   },
-  gradient: {
+  badge: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
     paddingVertical: 6,
     gap: spacing.xs,
   },
-  mult: {
-    marginLeft: spacing.xs,
-    borderRadius: radius.pill,
-    paddingHorizontal: spacing.xs,
-    backgroundColor: colors.glass,
+  text: {
+    color: '#000',
   },
 });
 

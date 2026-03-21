@@ -4,7 +4,7 @@ import {
   StyleSheet,
   Text,
   Image,
-  useWindowDimensions,
+  Dimensions,
   Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,186 +12,254 @@ import Animated, {
   useSharedValue,
   withTiming,
   useAnimatedStyle,
+  withRepeat,
+  Easing,
 } from "react-native-reanimated";
 import { useRouter } from "expo-router";
-import { Carousel } from "../components/Carousel";
-import { colors } from "../theme/colors";
+import { BlurView } from "expo-blur";
 
-const pattern = require("../../assets/pattern.png");
-const image1 = require("../../assets/caroselone.png");
-const image2 = require("../../assets/caroseltwo.png");
-const image3 = require("../../assets/caroselthree.png");
+const { width } = Dimensions.get("window");
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+// Images
+const bgImage = require("../../assets/baground.png");
+const images = [
+  require("../../assets/caroselone.png"),
+  require("../../assets/caroseltwo.png"),
+  require("../../assets/caroselthree.png"),
+  require("../../assets/caroselfour.png"),
+  require("../../assets/caroselfive.png"),
+  require("../../assets/caroselsix.png"),
+];
 
 export default function WelcomeScreen() {
-  const { height } = useWindowDimensions();
   const router = useRouter();
 
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(16);
+  const translateX1 = useSharedValue(0);
+  const translateX2 = useSharedValue(0);
+  const scaleAnim = useSharedValue(1);
 
   useEffect(() => {
-    opacity.value = withTiming(1, { duration: 600 });
-    translateY.value = withTiming(0, { duration: 600 });
+    // Smooth cinematic movement
+    translateX1.value = withRepeat(
+      withTiming(-width, {
+        duration: 14000,
+        easing: Easing.linear,
+      }),
+      -1
+    );
+
+    translateX2.value = withRepeat(
+      withTiming(width, {
+        duration: 16000,
+        easing: Easing.linear,
+      }),
+      -1
+    );
+
+    // subtle floating animation
+    scaleAnim.value = withRepeat(
+      withTiming(1.05, { duration: 3000 }),
+      -1,
+      true
+    );
   }, []);
 
-  const screenAnim = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateY: translateY.value }],
+  const row1Style = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX1.value }],
   }));
 
-  const createButtonScale = () => {
-    const scale = useSharedValue(1);
-    const style = useAnimatedStyle(() => ({
-      transform: [{ scale: scale.value }],
-    }));
-    const handlers = {
-      onPressIn: () => {
-        scale.value = withTiming(0.97, { duration: 80 });
-      },
-      onPressOut: () => {
-        scale.value = withTiming(1, { duration: 80 });
-      },
-    };
-    return { style, handlers };
-  };
+  const row2Style = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX2.value }],
+  }));
 
-  const primaryButton = createButtonScale();
-  const secondaryButton = createButtonScale();
-
-  const onSignUp = () => {
-    router.push("/signup");
-  };
-
-  const onSignIn = () => {
-    router.push("/login");
-  };
-
-  const topSectionHeight = height * 0.5;
+  const floatingStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scaleAnim.value }],
+  }));
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.patternWrap}>
-        <Image
-          source={pattern}
-          style={styles.pattern}
-          resizeMode="repeat"
-        />
+    <SafeAreaView style={styles.container}>
+      {/* BACKGROUND */}
+      <Image source={bgImage} style={styles.bgImage} />
+
+      {/* DARK + GRADIENT OVERLAY */}
+      <View style={styles.overlay} />
+
+      {/* MOVING CARDS */}
+      <View style={styles.carouselContainer}>
+        <Animated.View style={[styles.row, row1Style]}>
+          {images.concat(images).map((img, i) => (
+            <Animated.Image
+              key={i}
+              source={img}
+              style={[styles.cardImage, floatingStyle]}
+            />
+          ))}
+        </Animated.View>
+
+        <Animated.View style={[styles.row, row2Style]}>
+          {images.reverse().concat(images).map((img, i) => (
+            <Animated.Image
+              key={i}
+              source={img}
+              style={[styles.cardImage, floatingStyle]}
+            />
+          ))}
+        </Animated.View>
       </View>
 
-      <Animated.View style={[styles.container, screenAnim]}>
-        <View style={[styles.topSection, { height: topSectionHeight }]}>
-          <Carousel images={[image1, image2, image3]} />
-        </View>
+      {/* GLASS TEXT CARD */}
+      <BlurView intensity={50} tint="dark" style={styles.glassCard}>
+        <Text style={styles.title}>Faith Frames</Text>
+        <Text style={styles.subtitle}>
+          Experience faith in a modern, beautiful way
+        </Text>
+      </BlurView>
 
-        <View style={styles.textSection}>
-          <Text style={styles.title}>Faith Frames</Text>
-          <Text style={styles.subtitleEmphasis}>Faith in Every Frame</Text>
-          <Text style={styles.subtitle}>
-            Discover beautiful Christian wallpapers and inspiring Bible verses
-            for your phone.
-          </Text>
-        </View>
-
-        <View style={styles.footer}>
-          <AnimatedPressable
-            {...primaryButton.handlers}
-            style={[styles.primaryButton, primaryButton.style]}
-            onPress={onSignUp}
-          >
-            <Text style={styles.primaryText}>SIGN UP</Text>
-          </AnimatedPressable>
-
-          <AnimatedPressable
-            {...secondaryButton.handlers}
-            style={[styles.secondaryButton, secondaryButton.style]}
-            onPress={onSignIn}
-          >
-            <Text style={styles.secondaryText}>SIGN IN</Text>
-          </AnimatedPressable>
-        </View>
-      </Animated.View>
+      {/* BUTTONS */}
+      <View style={styles.buttonContainer}>
+        <PremiumButton
+          title="Create Account"
+          primary
+          onPress={() => router.push("/signup")}
+        />
+        <PremiumButton
+          title="Login"
+          onPress={() => router.push("/login")}
+        />
+      </View>
     </SafeAreaView>
   );
 }
 
+/* ================= PREMIUM BUTTON ================= */
+
+function PremiumButton({ title, onPress, primary }) {
+  const scale = useSharedValue(1);
+
+  const style = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <Animated.View style={[style]}>
+      <Pressable
+        onPressIn={() => (scale.value = withTiming(0.96))}
+        onPressOut={() => (scale.value = withTiming(1))}
+        onPress={onPress}
+        style={[
+          styles.button,
+          primary ? styles.primaryButton : styles.secondaryButton,
+        ]}
+      >
+        <Text
+          style={[
+            styles.buttonText,
+            primary ? styles.primaryText : styles.secondaryText,
+          ]}
+        >
+          {title}
+        </Text>
+      </Pressable>
+    </Animated.View>
+  );
+}
+
+/* ================= STYLES ================= */
+
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#FDF7ED",
-  },
-  patternWrap: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.06,
-  },
-  pattern: {
-    width: "100%",
-    height: "100%",
-  },
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 24,
+    backgroundColor: "#000",
   },
-  topSection: {
-    justifyContent: "flex-start",
-    paddingTop: 12,
+
+  bgImage: {
+    ...StyleSheet.absoluteFillObject,
   },
-  textSection: {
-    marginTop: 28,
+
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.7)",
+  },
+
+  carouselContainer: {
+    marginTop: 80,
+    gap: 25,
+  },
+
+  row: {
+    flexDirection: "row",
+  },
+
+  cardImage: {
+    width: 150,
+    height: 200,
+    marginHorizontal: 10,
+    borderRadius: 20,
+    resizeMode: "cover",
+    opacity: 0.9,
+  },
+
+  glassCard: {
+    marginTop: 40,
+    marginHorizontal: 20,
+    borderRadius: 20,
+    padding: 20,
     alignItems: "center",
-    paddingHorizontal: 12,
+    overflow: "hidden",
   },
+
   title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#1F2933",
-    textAlign: "center",
+    fontSize: 38,
+    fontWeight: "900",
+    color: "#fff",
+    letterSpacing: 1,
   },
-  subtitleEmphasis: {
-    marginTop: 6,
-    fontSize: 16,
-    color: colors.warning,
-    fontWeight: "600",
-    textAlign: "center",
-  },
+
   subtitle: {
+    fontSize: 15,
+    color: "#ffb380",
     marginTop: 10,
-    fontSize: 14,
-    color: "#6B7280",
     textAlign: "center",
-    lineHeight: 20,
   },
-  footer: {
+
+  buttonContainer: {
     marginTop: "auto",
-    gap: 12,
+    paddingHorizontal: 20,
+    marginBottom: 40,
+    gap: 16,
   },
+
+  button: {
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
   primaryButton: {
-    height: 56,
-    borderRadius: 999,
-    backgroundColor: colors.warning,
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: "#ff7217",
+    shadowColor: "#ff7217",
+    shadowOpacity: 0.6,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  primaryText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
+
   secondaryButton: {
-    height: 56,
-    borderRadius: 999,
-    borderWidth: 1.4,
-    borderColor: colors.warning,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "transparent",
+    borderWidth: 1.5,
+    borderColor: "#ff7217",
+    backgroundColor: "rgba(255,255,255,0.05)",
   },
-  secondaryText: {
-    color: colors.warning,
+
+  buttonText: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
+  },
+
+  primaryText: {
+    color: "#fff",
+  },
+
+  secondaryText: {
+    color: "#ff7217",
   },
 });
-

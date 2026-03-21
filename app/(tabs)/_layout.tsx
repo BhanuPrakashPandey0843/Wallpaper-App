@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Compass, Heart } from 'lucide-react-native';
+import { Home, Library, Lightbulb, BarChart2, Settings } from 'lucide-react-native';
 import CustomTabBar from '../../src/components/navigation/CustomTabBar';
 
 export default function TabLayout() {
@@ -13,17 +13,31 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="library"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, size }) => <Compass color={color} size={size} />,
+          title: 'Library',
+          tabBarIcon: ({ color, size }) => <Library color={color} size={size} />,
         }}
       />
       <Tabs.Screen
-        name="favorites"
+        name="quiz"
         options={{
-          title: 'Favorites',
-          tabBarIcon: ({ color, size }) => <Heart color={color} size={size} />,
+          title: 'Quiz',
+          tabBarIcon: ({ color, size }) => <Lightbulb color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="progress"
+        options={{
+          title: 'Progress',
+          tabBarIcon: ({ color, size }) => <BarChart2 color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color, size }) => <Settings color={color} size={size} />,
         }}
       />
     </Tabs>

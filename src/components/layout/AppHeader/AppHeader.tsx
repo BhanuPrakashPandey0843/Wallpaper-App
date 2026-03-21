@@ -20,7 +20,7 @@ export const AppHeader: React.FC = React.memo(() => {
   return (
     <View style={styles.container}>
       <View style={styles.row}>
-        <HeaderTitle title={greeting ?? appName} subtitle={greeting ? appName : null} />
+        <HeaderTitle title={greeting ?? appName} subtitle={greeting ? appName : role} />
         <View style={{ flexDirection: 'row', alignItems: 'center', gap }}>
           <CoinBadge coins={coins ?? 0} multiplier={multiplier} premium={premium} accessibleLabel={coinAccessibleLabel} />
           <UserAvatar uri={avatarUri} premium={premium} onPress={onPressAvatar} />

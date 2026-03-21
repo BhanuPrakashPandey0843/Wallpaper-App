@@ -10,22 +10,22 @@ import { colors } from '../../../theme/colors';
 import Text from '../../../components/ui/Text';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = SCREEN_WIDTH * 0.75;
-const CARD_HEIGHT = 200;
+const REEL_WIDTH = 180; // Increased size
+const REEL_HEIGHT = 320; // Increased size
 
-interface Story {
+interface Reel {
   id: string;
   title: string;
   image: any;
 }
 
 interface Props {
-  stories: Story[];
+  reels: Reel[];
   onOpen: (id: string) => void;
   loading?: boolean;
 }
 
-const ProphetCard = React.memo(({ item, onPress }: { item: Story; onPress: () => void }) => {
+const ReelCard = React.memo(({ item, onPress }: { item: Reel; onPress: () => void }) => {
   const scale = useSharedValue(1);
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }]
@@ -49,7 +49,7 @@ const ProphetCard = React.memo(({ item, onPress }: { item: Story; onPress: () =>
     >
       <Animated.View style={[styles.cardContent, animatedStyle]}>
         <View style={styles.imageWrapper}>
-          <View style={styles.uDipTop} />
+          <View style={styles.topBulge} />
           
           <Image
             source={item.image}
@@ -57,10 +57,12 @@ const ProphetCard = React.memo(({ item, onPress }: { item: Story; onPress: () =>
             style={styles.image}
             transition={300}
           />
-
-          <View style={styles.uDipBottom} />
+          
+          <View style={styles.playOverlay}>
+            <View style={styles.playIcon} />
+          </View>
         </View>
-        <Text variant="sm" bold style={styles.cardTitle}>
+        <Text variant="xs" bold style={styles.cardTitle} numberOfLines={1}>
           {item.title}
         </Text>
       </Animated.View>
@@ -68,34 +70,31 @@ const ProphetCard = React.memo(({ item, onPress }: { item: Story; onPress: () =>
   );
 });
 
-export const ProphetStoriesSection: React.FC<Props> = React.memo(({ stories, onOpen, loading }) => {
-  const renderItem = useCallback(({ item }: { item: Story }) => {
-    return <ProphetCard item={item} onPress={() => onOpen(item.id)} />;
+export const ProphetReelsSection: React.FC<Props> = React.memo(({ reels, onOpen, loading }) => {
+  const renderItem = useCallback(({ item }: { item: Reel }) => {
+    return <ReelCard item={item} onPress={() => onOpen(item.id)} />;
   }, [onOpen]);
 
-  const keyExtractor = useCallback((item: Story) => item.id, []);
+  const keyExtractor = useCallback((item: Reel) => item.id, []);
 
   return (
     <View style={styles.container}>
-      <SectionHeader title="Prophet Stories" />
+      <SectionHeader title="Prophet Reels" />
       {loading ? (
         <View style={styles.content}>
-          {Array.from({ length: 3 }).map((_, i) => (
-            <View key={`ps-skeleton-${i}`} style={styles.skeleton} />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <View key={`reel-skeleton-${i}`} style={styles.skeleton} />
           ))}
         </View>
       ) : (
         <FlashList
-          data={stories}
+          data={reels}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.content}
-          estimatedItemSize={CARD_WIDTH}
-          snapToInterval={CARD_WIDTH + spacing.md}
-          decelerationRate="fast"
-          snapToAlignment="start"
+          estimatedItemSize={REEL_WIDTH}
         />
       )}
     </View>
@@ -110,63 +109,74 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   cardContainer: {
-    width: CARD_WIDTH,
+    width: REEL_WIDTH,
     marginRight: spacing.md,
+    alignItems: 'center',
   },
   cardContent: {
     width: '100%',
+    alignItems: 'center',
   },
   imageWrapper: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    borderRadius: 32,
-    overflow: 'hidden',
+    width: REEL_WIDTH,
+    height: REEL_HEIGHT,
+    borderRadius: 24,
     backgroundColor: colors.surfaceElevated,
     position: 'relative',
-    alignItems: 'center',
+    overflow: 'visible', // Allow bulge to show
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 6,
   },
   image: {
     width: '100%',
     height: '100%',
-    borderRadius: 32,
+    borderRadius: 24,
   },
-  // TOP CENTER INDENTATION
-  uDipTop: {
+  topBulge: {
     position: 'absolute',
-    top: -24, // Pushed higher
-    width: 140, // Much wider (longer)
-    height: 48, // More height for deeper curve
-    borderRadius: 70, // Half of width for smooth ellipse
-    backgroundColor: colors.background,
+    top: -15, // Pushed slightly higher
+    alignSelf: 'center',
+    width: 80, // Wider bulge
+    height: 40, // More prominent bulge
+    borderRadius: 40,
+    backgroundColor: '#1E1E1E', // Matches surface color
     zIndex: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
   },
-  // BOTTOM CENTER INDENTATION
-  uDipBottom: {
-    position: 'absolute',
-    bottom: -24, // Pushed lower
-    width: 140, // Much wider (longer)
-    height: 48, // More height for deeper curve
-    borderRadius: 70, // Half of width for smooth ellipse
-    backgroundColor: colors.background,
-    zIndex: 10,
+  playOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.1)',
+  },
+  playIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    borderWidth: 1,
+    borderColor: '#FFF',
   },
   cardTitle: {
-    marginTop: 10,
-    color: colors.textPrimary,
-    paddingHorizontal: 4,
+    marginTop: 8,
+    color: colors.textSecondary,
+    width: '100%',
+    textAlign: 'center',
   },
   skeleton: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
+    width: REEL_WIDTH,
+    height: REEL_HEIGHT,
     marginRight: spacing.md,
-    borderRadius: 32,
+    borderRadius: 24,
     backgroundColor: colors.surfaceElevated,
   },
 });
 
-export default ProphetStoriesSection;
+export default ProphetReelsSection;

@@ -1,39 +1,46 @@
 {
   "expo": {
-    "name": "Faithframes",
+    "name": "Faith Frames",
     "slug": "Faithframes",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "faithframes",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+
     "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/Faith.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#000000"
     },
+
     "ios": {
       "supportsTablet": true
     },
+
     "android": {
+      "jsEngine": "hermes",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.plootus1.Faithframes"
     },
+
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+
+    "assetBundlePatterns": ["**/*"],
+
     "plugins": [
       "expo-router",
       "expo-image",
-      "expo-font"
+      "expo-font",
+      "expo-dev-client"
     ]
   }
 }

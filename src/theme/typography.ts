@@ -1,6 +1,6 @@
 export const typography = {
-  fontFamily: 'Inter_400Regular',
-  fontFamilyBold: 'Inter_700Bold',
+  fontFamily: 'Poppins_400Regular',
+  fontFamilyBold: 'Poppins_700Bold',
   size: {
     xs: 12,
     sm: 14,
