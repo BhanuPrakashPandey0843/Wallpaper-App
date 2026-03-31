@@ -5,6 +5,7 @@ import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { SectionHeader } from '../../../components/composites/SectionHeader';
+import { WavyCurve } from '../../../components/ui/WavyCurve';
 import { spacing } from '../../../theme/spacing';
 import { colors } from '../../../theme/colors';
 import Text from '../../../components/ui/Text';
@@ -49,16 +50,13 @@ const ProphetCard = React.memo(({ item, onPress }: { item: Story; onPress: () =>
     >
       <Animated.View style={[styles.cardContent, animatedStyle]}>
         <View style={styles.imageWrapper}>
-          <View style={styles.uDipTop} />
-          
           <Image
             source={item.image}
             contentFit="cover"
             style={styles.image}
             transition={300}
           />
-
-          <View style={styles.uDipBottom} />
+          <WavyCurve width={CARD_WIDTH} height={40} color={colors.background} />
         </View>
         <Text variant="sm" bold style={styles.cardTitle}>
           {item.title}
@@ -92,7 +90,6 @@ export const ProphetStoriesSection: React.FC<Props> = React.memo(({ stories, onO
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.content}
-          estimatedItemSize={CARD_WIDTH}
           snapToInterval={CARD_WIDTH + spacing.md}
           decelerationRate="fast"
           snapToAlignment="start"
@@ -134,26 +131,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 32,
-  },
-  // TOP CENTER INDENTATION
-  uDipTop: {
-    position: 'absolute',
-    top: -24, // Pushed higher
-    width: 140, // Much wider (longer)
-    height: 48, // More height for deeper curve
-    borderRadius: 70, // Half of width for smooth ellipse
-    backgroundColor: colors.background,
-    zIndex: 10,
-  },
-  // BOTTOM CENTER INDENTATION
-  uDipBottom: {
-    position: 'absolute',
-    bottom: -24, // Pushed lower
-    width: 140, // Much wider (longer)
-    height: 48, // More height for deeper curve
-    borderRadius: 70, // Half of width for smooth ellipse
-    backgroundColor: colors.background,
-    zIndex: 10,
   },
   cardTitle: {
     marginTop: 10,

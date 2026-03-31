@@ -5,6 +5,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-na
 import { radius } from '../../theme/radius';
 import { spacing } from '../../theme/spacing';
 import { colors } from '../../theme/colors';
+import { WavyCurve } from '../ui/WavyCurve';
 import Text from '../ui/Text';
 import * as Haptics from 'expo-haptics';
 
@@ -41,6 +42,7 @@ export const StoryCard: React.FC<Props> = React.memo(({ title, image, onPress, w
             cachePolicy="memory-disk"
             style={{ width, height, borderRadius: 24 }}
           />
+          <WavyCurve width={width} height={30} color={colors.background} />
         </View>
         <Text variant="xs" bold style={styles.cardTitle} numberOfLines={2}>
           {title}

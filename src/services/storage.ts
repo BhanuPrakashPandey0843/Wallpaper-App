@@ -19,4 +19,9 @@ export const storage = {
       await AsyncStorage.setItem(key, JSON.stringify(value));
     } catch {}
   },
+  async remove(key: string): Promise<void> {
+    try {
+      await AsyncStorage.removeItem(key);
+    } catch {}
+  },
 };

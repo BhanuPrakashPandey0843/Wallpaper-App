@@ -5,13 +5,14 @@ import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { SectionHeader } from '../../../components/composites/SectionHeader';
-import { spacing } from '../../../theme/spacing';
+import { Svg, Path } from 'react-native-svg';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../../theme/colors';
 import Text from '../../../components/ui/Text';
+import { useRouter } from 'expo-router';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const REEL_WIDTH = 180; // Increased size
-const REEL_HEIGHT = 320; // Increased size
+const REEL_SIZE = SCREEN_WIDTH - 32; // Hardcoded spacing.md * 2
 
 interface Reel {
   id: string;
@@ -49,20 +50,32 @@ const ReelCard = React.memo(({ item, onPress }: { item: Reel; onPress: () => voi
     >
       <Animated.View style={[styles.cardContent, animatedStyle]}>
         <View style={styles.imageWrapper}>
-          <View style={styles.topBulge} />
-          
           <Image
             source={item.image}
             contentFit="cover"
             style={styles.image}
             transition={300}
           />
+          <View style={styles.bulgeContainer}>
+            <Svg
+              width={REEL_SIZE}
+              height={40}
+              viewBox={`0 0 ${REEL_SIZE} 40`}
+            >
+              <Path
+                d={`M0 0 Q${REEL_SIZE / 2} 40 ${REEL_SIZE} 0 L${REEL_SIZE} 40 L0 40 Z`}
+                fill={colors.background}
+              />
+            </Svg>
+          </View>
           
           <View style={styles.playOverlay}>
-            <View style={styles.playIcon} />
+            <View style={styles.playIconContainer}>
+              <Ionicons name="play" size={28} color="#FFF" style={{ marginLeft: 4 }} />
+            </View>
           </View>
         </View>
-        <Text variant="xs" bold style={styles.cardTitle} numberOfLines={1}>
+        <Text variant="sm" bold style={styles.cardTitle} numberOfLines={1}>
           {item.title}
         </Text>
       </Animated.View>
@@ -70,10 +83,12 @@ const ReelCard = React.memo(({ item, onPress }: { item: Reel; onPress: () => voi
   );
 });
 
-export const ProphetReelsSection: React.FC<Props> = React.memo(({ reels, onOpen, loading }) => {
-  const renderItem = useCallback(({ item }: { item: Reel }) => {
-    return <ReelCard item={item} onPress={() => onOpen(item.id)} />;
-  }, [onOpen]);
+const ProphetReelsSection: React.FC<Props> = ({ reels, onOpen, loading }) => {
+  const router = useRouter();
+  
+  const renderItem = useCallback(({ item }: { item: Reel }) => (
+    <ReelCard item={item} onPress={() => onOpen(item.id)} />
+  ), [onOpen]);
 
   const keyExtractor = useCallback((item: Reel) => item.id, []);
 
@@ -91,26 +106,28 @@ export const ProphetReelsSection: React.FC<Props> = React.memo(({ reels, onOpen,
           data={reels}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
-          horizontal
-          showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.content}
-          estimatedItemSize={REEL_WIDTH}
+          ListFooterComponent={() => (
+            <Pressable style={styles.viewMoreButton} onPress={() => router.push('/(tabs)/library')}>
+              <Text style={styles.viewMoreText}>View More</Text>
+            </Pressable>
+          )}
         />
       )}
     </View>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: spacing.md,
+    paddingVertical: 16,
   },
   content: {
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: 16,
   },
   cardContainer: {
-    width: REEL_WIDTH,
-    marginRight: spacing.md,
+    width: '100%',
+    marginBottom: 24,
     alignItems: 'center',
   },
   cardContent: {
@@ -118,65 +135,69 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imageWrapper: {
-    width: REEL_WIDTH,
-    height: REEL_HEIGHT,
-    borderRadius: 24,
-    backgroundColor: colors.surfaceElevated,
+    width: REEL_SIZE,
+    height: REEL_SIZE,
+    borderRadius: 32,
+    backgroundColor: '#2C2C2C',
     position: 'relative',
-    overflow: 'visible', // Allow bulge to show
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 6,
+    overflow: 'hidden',
   },
   image: {
     width: '100%',
     height: '100%',
-    borderRadius: 24,
   },
-  topBulge: {
+  bulgeContainer: {
     position: 'absolute',
-    top: -15, // Pushed slightly higher
-    alignSelf: 'center',
-    width: 80, // Wider bulge
-    height: 40, // More prominent bulge
-    borderRadius: 40,
-    backgroundColor: '#1E1E1E', // Matches surface color
-    zIndex: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 8,
+    bottom: -1,
+    left: 0,
+    right: 0,
+    height: 40,
   },
   playOverlay: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: 'rgba(0,0,0,0.15)',
   },
-  playIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    borderWidth: 1,
-    borderColor: '#FFF',
+  playIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.5)',
   },
   cardTitle: {
-    marginTop: 8,
-    color: colors.textSecondary,
+    marginTop: 12,
+    color: '#FFFFFF',
     width: '100%',
     textAlign: 'center',
+    fontSize: 16,
   },
   skeleton: {
-    width: REEL_WIDTH,
-    height: REEL_HEIGHT,
-    marginRight: spacing.md,
-    borderRadius: 24,
-    backgroundColor: colors.surfaceElevated,
+    width: '100%',
+    height: REEL_SIZE,
+    marginBottom: 24,
+    borderRadius: 32,
+    backgroundColor: '#2C2C2C',
+  },
+  viewMoreButton: {
+    width: '100%',
+    height: 56,
+    backgroundColor: '#FF7D33',
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 32,
+  },
+  viewMoreText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 
-export default ProphetReelsSection;
+export default React.memo(ProphetReelsSection);

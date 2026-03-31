@@ -6,15 +6,12 @@ import { AppHeader } from '../../components/layout/AppHeader/AppHeader';
 import { SearchBar } from '../../components/composites/SearchBar';
 import { CategoriesSection } from './components/CategoriesSection';
 import { ProphetStoriesSection } from './components/ProphetStoriesSection';
-import { ProphetReelsSection } from './components/ProphetReelsSection';
-import { useGetWallpapersQuery } from '../../store/api/wallpapersApi';
+import ProphetReelsSection from './components/ProphetReelsSection';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
+  const router = useRouter();
   const pattern = require('../../../assets/pattern.png');
-
-  const onCategorySelect = useCallback((id: string) => {}, []);
-  const onOpenStory = useCallback((id: string) => {}, []);
-  const onSearch = useCallback((q: string) => {}, []);
 
   const prophetStories = useMemo(
     () => [
@@ -68,6 +65,43 @@ export default function HomeScreen() {
     []
   );
 
+  const onCategorySelect = useCallback(
+    (id: string) => {
+      if (id === 'morals') {
+        router.push('/library/daily-prayer');
+        return;
+      }
+      if (id === 'heroes') {
+        router.push('/(tabs)/progress');
+        return;
+      }
+      router.push('/library/daily-verse');
+    },
+    [router]
+  );
+  
+  const onOpenStory = useCallback((id: string) => {
+    const story = prophetStories.find(s => s.id === id);
+    router.push({
+      pathname: `/reel/${id}`,
+      params: { title: story?.title }
+    });
+  }, [router, prophetStories]);
+
+  const onOpenReel = useCallback((id: string) => {
+    const reel = prophetReels.find(r => r.id === id);
+    router.push({
+      pathname: `/reel/${id}`,
+      params: { 
+        title: reel?.title,
+        // Since we can't easily pass a require() through params, 
+        // the detail screen should probably fetch or have its own mapping.
+      }
+    });
+  }, [router, prophetReels]);
+
+  const onSearch = useCallback((q: string) => {}, []);
+
   return (
     <View style={styles.container}>
       {/* Background Pattern */}
@@ -92,7 +126,7 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.sectionContainer}>
-          <ProphetReelsSection reels={prophetReels} onOpen={onOpenStory} />
+          <ProphetReelsSection reels={prophetReels} onOpen={onOpenReel} />
         </View>
       </ScrollView>
     </View>

@@ -12,11 +12,34 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
+  SharedValue,
 } from "react-native-reanimated";
 
 type CarouselProps = {
   images: number[];
   autoPlayIntervalMs?: number;
+};
+
+const AnimatedDot = ({ 
+  index, 
+  progress 
+}: { 
+  index: number; 
+  progress: SharedValue<number>; 
+}) => {
+  const animatedDotStyle = useAnimatedStyle(() => {
+    const isActive = Math.round(progress.value) === index;
+    return {
+      width: withTiming(isActive ? 18 : 8, { duration: 200 }),
+      opacity: withTiming(isActive ? 1 : 0.4, { duration: 200 }),
+    };
+  });
+
+  return (
+    <Animated.View
+      style={[styles.dot, animatedDotStyle]}
+    />
+  );
 };
 
 export const Carousel: React.FC<CarouselProps> = ({
@@ -69,22 +92,9 @@ export const Carousel: React.FC<CarouselProps> = ({
       />
 
       <View style={styles.dotsRow}>
-        {images.map((_, index) => {
-          const animatedDotStyle = useAnimatedStyle(() => {
-            const isActive = Math.round(progress.value) === index;
-            return {
-              width: withTiming(isActive ? 18 : 8, { duration: 200 }),
-              opacity: withTiming(isActive ? 1 : 0.4, { duration: 200 }),
-            };
-          });
-
-          return (
-            <Animated.View
-              key={index}
-              style={[styles.dot, animatedDotStyle]}
-            />
-          );
-        })}
+        {images.map((_, index) => (
+          <AnimatedDot key={index} index={index} progress={progress} />
+        ))}
       </View>
     </View>
   );

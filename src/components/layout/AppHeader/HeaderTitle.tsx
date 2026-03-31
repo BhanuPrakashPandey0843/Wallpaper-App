@@ -11,7 +11,7 @@ interface Props {
 export const HeaderTitle: React.FC<Props> = React.memo(({ title, subtitle }) => {
   return (
     <View>
-      <Text variant="h3" bold style={styles.title}>
+      <Text variant="lg" bold style={styles.title}>
         {title}
       </Text>
       {subtitle && (

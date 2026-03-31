@@ -17,11 +17,23 @@ import Animated, {
 } from "react-native-reanimated";
 import { colors } from "../theme/colors";
 import { Pressable } from "react-native";
+import { storage } from "../services/storage";
+import { AUTH_STORAGE_KEY, AuthSession, defaultAuthSession } from "../features/auth/constants";
 
 const pattern = require("../../assets/pattern.png");
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function LoginScreen() {
+  const onLogin = async () => {
+    const current = (await storage.get<AuthSession>(AUTH_STORAGE_KEY)) ?? defaultAuthSession;
+    await storage.set<AuthSession>(AUTH_STORAGE_KEY, {
+      ...current,
+      hasOnboarded: true,
+      isAuthenticated: true,
+    });
+    router.replace("/(tabs)");
+  };
+
   const router = useRouter();
 
   const opacity = useSharedValue(0);
@@ -88,17 +100,18 @@ export default function LoginScreen() {
           <AnimatedPressable
             onPressIn={onPressIn}
             onPressOut={onPressOut}
-            onPress={() => router.replace("/(tabs)")}
+            onPress={onLogin}
             style={[styles.primaryButton, buttonAnim]}
           >
-            <Text style={styles.primaryText}>SIGN IN</Text>
+            <Text style={styles.primaryButtonText}>Sign In</Text>
           </AnimatedPressable>
 
-          <Pressable onPress={() => router.replace("/signup")}>
-            <Text style={styles.bottomText}>
-              New here? <Text style={styles.link}>Create an account</Text>
-            </Text>
-          </Pressable>
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>New here? </Text>
+            <Pressable onPress={() => router.push("/signup")}>
+              <Text style={styles.linkText}>Create an account</Text>
+            </Pressable>
+          </View>
         </Animated.View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -108,11 +121,11 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#FDF7ED",
+    backgroundColor: "#000",
   },
   patternWrap: {
     ...StyleSheet.absoluteFillObject,
-    opacity: 0.06,
+    opacity: 0.05,
   },
   pattern: {
     width: "100%",
@@ -120,60 +133,61 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 32,
-    paddingBottom: 24,
+    paddingHorizontal: 24,
+    justifyContent: "center",
   },
   title: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: "#1F2933",
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 8,
   },
   subtitle: {
-    marginTop: 6,
-    fontSize: 14,
-    color: "#6B7280",
+    fontSize: 16,
+    color: "#9CA3AF",
+    marginBottom: 32,
   },
   form: {
-    marginTop: 32,
     gap: 16,
+    marginBottom: 32,
   },
   label: {
-    fontSize: 13,
-    color: "#4B5563",
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#E5E7EB",
     marginBottom: 4,
   },
   input: {
-    height: 48,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    color: "#111827",
+    backgroundColor: "#1F2937",
+    borderRadius: 12,
+    padding: 16,
+    color: "#fff",
+    fontSize: 16,
   },
   primaryButton: {
-    marginTop: 32,
-    height: 54,
-    borderRadius: 999,
-    backgroundColor: colors.warning,
+    backgroundColor: colors.accent,
+    borderRadius: 12,
+    padding: 18,
     alignItems: "center",
-    justifyContent: "center",
   },
-  primaryText: {
-    color: "#FFFFFF",
+  primaryButtonText: {
+    color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "bold",
   },
-  bottomText: {
-    marginTop: 18,
-    textAlign: "center",
-    color: "#6B7280",
-    fontSize: 13,
+  footer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 24,
   },
-  link: {
-    color: colors.warning,
-    fontWeight: "600",
+  footerText: {
+    color: "#9CA3AF",
+    fontSize: 14,
+  },
+  linkText: {
+    color: colors.accent,
+    fontSize: 14,
+    fontWeight: "bold",
   },
 });
 

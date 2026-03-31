@@ -10,7 +10,7 @@ const CATEGORIES = [
     id: 'prophets',
     title: 'Prophets',
     color: '#B8F28C',
-    iconName: 'star-eight-points',
+    iconName: 'star-four-points',
     IconLib: MaterialCommunityIcons,
     iconColor: '#4A7C2C',
     iconSize: 26,
@@ -94,6 +94,10 @@ const CategoryItem = React.memo(({ item, onSelect, index }: { item: any, onSelec
     </MotiView>
   );
 });
+
+interface Props {
+  onSelect: (id: string) => void;
+}
 
 export const CategoriesSection: React.FC<Props> = React.memo(({ onSelect }) => {
   return (

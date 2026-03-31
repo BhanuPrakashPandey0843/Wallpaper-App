@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -6,260 +6,271 @@ import {
   Image,
   Dimensions,
   Pressable,
+  FlatList,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { WavyCurve } from "../components/ui/WavyCurve";
 import Animated, {
   useSharedValue,
-  withTiming,
   useAnimatedStyle,
-  withRepeat,
-  Easing,
+  interpolate,
+  Extrapolation,
+  interpolateColor,
+  SharedValue,
 } from "react-native-reanimated";
 import { useRouter } from "expo-router";
-import { BlurView } from "expo-blur";
+import { StatusBar } from "expo-status-bar";
+import { storage } from "../services/storage";
+import { AUTH_STORAGE_KEY, AuthSession, defaultAuthSession } from "../features/auth/constants";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
-// Images
-const bgImage = require("../../assets/baground.png");
-const images = [
-  require("../../assets/caroselone.png"),
-  require("../../assets/caroseltwo.png"),
-  require("../../assets/caroselthree.png"),
-  require("../../assets/caroselfour.png"),
-  require("../../assets/caroselfive.png"),
-  require("../../assets/caroselsix.png"),
+const SLIDES = [
+  {
+    id: "1",
+    title: "Discover Stories from\nIslamic History",
+    subtitle:
+      "Listen to beautiful audio stories of Prophets and\nheroes of Islam — made just for kids!",
+    image: require("../../assets/ooks.png"),
+  },
+  {
+    id: "2",
+    title: "Fun Quizzes After\nEach Story",
+    subtitle:
+      "Unlock quizzes after listening to test what you’ve\nlearned — smart and exciting!",
+    image: require("../../assets/reelo.png"),
+  },
+  {
+    id: "3",
+    title: "Grow with\nRewards",
+    subtitle:
+      "Earn points, unlock badges, and see your learning\njourney come to life!",
+    image: require("../../assets/pattern.png"),
+  },
 ];
+
+const PaginationDot = ({ 
+  index, 
+  scrollX 
+}: { 
+  index: number; 
+  scrollX: SharedValue<number>; 
+}) => {
+  const dotStyle = useAnimatedStyle(() => {
+    const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+    const dotWidth = interpolate(
+      scrollX.value,
+      inputRange,
+      [10, 24, 10],
+      Extrapolation.CLAMP
+    );
+    return {
+      width: dotWidth,
+      backgroundColor: interpolateColor(
+        scrollX.value,
+        inputRange,
+        ["#E0E0E0", "#F4792B", "#E0E0E0"]
+      ),
+    };
+  });
+
+  return (
+    <Animated.View
+      style={[
+        styles.dot,
+        dotStyle,
+      ]}
+    />
+  );
+};
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const flatListRef = useRef<FlatList>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollX = useSharedValue(0);
 
-  const translateX1 = useSharedValue(0);
-  const translateX2 = useSharedValue(0);
-  const scaleAnim = useSharedValue(1);
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    scrollX.value = event.nativeEvent.contentOffset.x;
+    const index = Math.round(event.nativeEvent.contentOffset.x / width);
+    setCurrentIndex(index);
+  };
 
-  useEffect(() => {
-    // Smooth cinematic movement
-    translateX1.value = withRepeat(
-      withTiming(-width, {
-        duration: 14000,
-        easing: Easing.linear,
-      }),
-      -1
+  const persistOnboardedAndNavigate = async () => {
+    const current = (await storage.get<AuthSession>(AUTH_STORAGE_KEY)) ?? defaultAuthSession;
+    await storage.set<AuthSession>(AUTH_STORAGE_KEY, {
+      ...current,
+      hasOnboarded: true,
+    });
+    router.push("/signup");
+  };
+
+  const handleContinue = () => {
+    if (currentIndex < SLIDES.length - 1) {
+      flatListRef.current?.scrollToIndex({
+        index: currentIndex + 1,
+        animated: true,
+      });
+    } else {
+      persistOnboardedAndNavigate();
+    }
+  };
+
+  const handleSkip = () => {
+    persistOnboardedAndNavigate();
+  };
+
+  const renderItem = ({ item, index }: { item: typeof SLIDES[0]; index: number }) => {
+    return (
+      <View style={styles.slide}>
+        <View style={styles.imageContainer}>
+          <Image source={item.image} style={styles.image} resizeMode="cover" />
+          <WavyCurve width={width} color="#FFFBF0" />
+        </View>
+        <View style={styles.textContainer}>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.subtitle}>{item.subtitle}</Text>
+        </View>
+      </View>
     );
-
-    translateX2.value = withRepeat(
-      withTiming(width, {
-        duration: 16000,
-        easing: Easing.linear,
-      }),
-      -1
-    );
-
-    // subtle floating animation
-    scaleAnim.value = withRepeat(
-      withTiming(1.05, { duration: 3000 }),
-      -1,
-      true
-    );
-  }, []);
-
-  const row1Style = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX1.value }],
-  }));
-
-  const row2Style = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX2.value }],
-  }));
-
-  const floatingStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scaleAnim.value }],
-  }));
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* BACKGROUND */}
-      <Image source={bgImage} style={styles.bgImage} />
+    <View style={styles.container}>
+      <StatusBar style="dark" />
+      
+      {/* SKIP BUTTON */}
+      {currentIndex < SLIDES.length - 1 && (
+        <Pressable onPress={handleSkip} style={styles.skipButton}>
+          <Text style={styles.skipText}>Skip</Text>
+        </Pressable>
+      )}
 
-      {/* DARK + GRADIENT OVERLAY */}
-      <View style={styles.overlay} />
+      {/* CAROUSEL */}
+      <FlatList
+        ref={flatListRef}
+        data={SLIDES}
+        renderItem={renderItem}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        keyExtractor={(item) => item.id}
+      />
 
-      {/* MOVING CARDS */}
-      <View style={styles.carouselContainer}>
-        <Animated.View style={[styles.row, row1Style]}>
-          {images.concat(images).map((img, i) => (
-            <Animated.Image
-              key={i}
-              source={img}
-              style={[styles.cardImage, floatingStyle]}
-            />
+      {/* BOTTOM CONTROLS */}
+      <SafeAreaView edges={["bottom"]} style={styles.bottomContainer}>
+        {/* PAGINATION DOTS */}
+        <View style={styles.paginationContainer}>
+          {SLIDES.map((_, index) => (
+            <PaginationDot key={index} index={index} scrollX={scrollX} />
           ))}
-        </Animated.View>
+        </View>
 
-        <Animated.View style={[styles.row, row2Style]}>
-          {images.reverse().concat(images).map((img, i) => (
-            <Animated.Image
-              key={i}
-              source={img}
-              style={[styles.cardImage, floatingStyle]}
-            />
-          ))}
-        </Animated.View>
-      </View>
-
-      {/* GLASS TEXT CARD */}
-      <BlurView intensity={50} tint="dark" style={styles.glassCard}>
-        <Text style={styles.title}>Faith Frames</Text>
-        <Text style={styles.subtitle}>
-          Experience faith in a modern, beautiful way
-        </Text>
-      </BlurView>
-
-      {/* BUTTONS */}
-      <View style={styles.buttonContainer}>
-        <PremiumButton
-          title="Create Account"
-          primary
-          onPress={() => router.push("/signup")}
-        />
-        <PremiumButton
-          title="Login"
-          onPress={() => router.push("/login")}
-        />
-      </View>
-    </SafeAreaView>
+        {/* CONTINUE BUTTON */}
+        <Pressable onPress={handleContinue} style={styles.continueButton}>
+          <Text style={styles.continueButtonText}>
+            {currentIndex === SLIDES.length - 1 ? "Get Started" : "Continue"}
+          </Text>
+        </Pressable>
+      </SafeAreaView>
+    </View>
   );
 }
-
-/* ================= PREMIUM BUTTON ================= */
-
-function PremiumButton({ title, onPress, primary }) {
-  const scale = useSharedValue(1);
-
-  const style = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  return (
-    <Animated.View style={[style]}>
-      <Pressable
-        onPressIn={() => (scale.value = withTiming(0.96))}
-        onPressOut={() => (scale.value = withTiming(1))}
-        onPress={onPress}
-        style={[
-          styles.button,
-          primary ? styles.primaryButton : styles.secondaryButton,
-        ]}
-      >
-        <Text
-          style={[
-            styles.buttonText,
-            primary ? styles.primaryText : styles.secondaryText,
-          ]}
-        >
-          {title}
-        </Text>
-      </Pressable>
-    </Animated.View>
-  );
-}
-
-/* ================= STYLES ================= */
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#FFFBF0", // Warm cream/beige from image
   },
-
-  bgImage: {
-    ...StyleSheet.absoluteFillObject,
+  skipButton: {
+    position: "absolute",
+    top: 60,
+    right: 24,
+    zIndex: 10,
   },
-
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.7)",
+  skipText: {
+    fontSize: 16,
+    color: "#000",
+    fontWeight: "500",
   },
-
-  carouselContainer: {
-    marginTop: 80,
-    gap: 25,
-  },
-
-  row: {
-    flexDirection: "row",
-  },
-
-  cardImage: {
-    width: 150,
-    height: 200,
-    marginHorizontal: 10,
-    borderRadius: 20,
-    resizeMode: "cover",
-    opacity: 0.9,
-  },
-
-  glassCard: {
-    marginTop: 40,
-    marginHorizontal: 20,
-    borderRadius: 20,
-    padding: 20,
+  slide: {
+    width: width,
+    flex: 1,
     alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  imageContainer: {
+    width: width,
+    height: height * 0.55,
     overflow: "hidden",
   },
-
-  title: {
-    fontSize: 38,
-    fontWeight: "900",
-    color: "#fff",
-    letterSpacing: 1,
+  image: {
+    width: "100%",
+    height: "100%",
   },
-
+  textContainer: {
+    paddingHorizontal: 40,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#1A1A1A",
+    textAlign: "center",
+    lineHeight: 36,
+    marginBottom: 16,
+    fontFamily: "Poppins_700Bold", // Use Poppins if available, otherwise default
+  },
   subtitle: {
     fontSize: 15,
-    color: "#ffb380",
-    marginTop: 10,
+    color: "#666666",
     textAlign: "center",
+    lineHeight: 22,
+    fontFamily: "Poppins_400Regular",
   },
-
-  buttonContainer: {
-    marginTop: "auto",
-    paddingHorizontal: 20,
-    marginBottom: 40,
-    gap: 16,
-  },
-
-  button: {
-    height: 60,
-    borderRadius: 30,
-    justifyContent: "center",
+  bottomContainer: {
+    paddingHorizontal: 24,
+    paddingBottom: 40,
     alignItems: "center",
   },
-
-  primaryButton: {
-    backgroundColor: "#ff7217",
-    shadowColor: "#ff7217",
-    shadowOpacity: 0.6,
-    shadowRadius: 12,
-    elevation: 8,
+  paginationContainer: {
+    flexDirection: "row",
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
   },
-
-  secondaryButton: {
-    borderWidth: 1.5,
-    borderColor: "#ff7217",
-    backgroundColor: "rgba(255,255,255,0.05)",
+  dot: {
+    height: 6,
+    width: 10,
+    borderRadius: 3,
+    backgroundColor: "#F4792B", // Active color from image
+    marginHorizontal: 4,
   },
-
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "700",
+  activeDot: {
+    backgroundColor: "#F4792B",
   },
-
-  primaryText: {
+  continueButton: {
+    width: "100%",
+    height: 56,
+    backgroundColor: "#F4792B",
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#F4792B",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  continueButtonText: {
     color: "#fff",
-  },
-
-  secondaryText: {
-    color: "#ff7217",
+    fontSize: 18,
+    fontWeight: "600",
   },
 });
