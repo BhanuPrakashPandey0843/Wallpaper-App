@@ -1,6 +1,8 @@
 {
   "name": "faithframes",
   "version": "1.0.0",
+  "description": "A professional Expo application for spiritual growth, Bible study, and faith-based interactive quizzes.",
+  "author": "Faith Frames Team",
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",

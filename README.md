@@ -1,66 +1,184 @@
-# Faith Frames
+# Faith Frames – Spiritual Growth and Bible Quiz Application
 
-Faith Frames is a professional Expo-based React Native application designed for spiritual growth and reflection. It features high-quality Christian wallpapers, Bible reading, daily prayers, and interactive faith quizzes.
-
-## 🚀 Tech Stack
-
-- **Framework**: [Expo](https://expo.dev/) (SDK 55)
-- **Routing**: [Expo Router](https://docs.expo.dev/router/introduction/) (v3)
-- **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/)
-- **UI Components**: Custom UI system with [Reanimated](https://docs.swmansion.com/react-native-reanimated/) & [Moti](https://moti.fyi/) animations
-- **Icons**: [Lucide React Native](https://lucide.dev/) & [Ionicons](https://ionic.io/ionicons)
-- **Lists**: [FlashList](https://shopify.github.io/flash-list/) for high-performance rendering
-- **Styling**: React Native StyleSheet with a custom theme system
-
-## ✨ Features
-
-- **Daily Verse & Prayer**: Curated spiritual content to start your day.
-- **Bible Reader**: Access to sacred texts with a focus on readability.
-- **Faith Quiz**: Interactive quizzes with difficulty levels and categories.
-- **Wallpaper Gallery**: High-performance image loading with `expo-image`.
-- **Prophet Stories & Reels**: Engaging storytelling and short video-like experiences.
-- **Custom Navigation**: A sleek, animated tab bar and header system.
-
-## 🛠 Getting Started
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (v20 or newer recommended)
-- [Expo Go](https://expo.dev/go) app on your mobile device (optional, for development)
-- [Android Studio](https://developer.android.com/studio) or [Xcode](https://developer.apple.com/xcode/) (for native builds)
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/faithframes.git
-   cd faithframes
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the development server:
-   ```bash
-   npx expo start
-   ```
-
-## 📂 Project Structure
-
-- `app/`: Expo Router file-based navigation routes.
-- `src/components/`: Reusable UI and composite components.
-- `src/features/`: Feature-specific logic, screens, and data.
-- `src/services/`: API clients, storage, and utility services.
-- `src/store/`: Redux store configuration and slices.
-- `src/theme/`: Global styles, colors, and design tokens.
-- `assets/`: Images, fonts, and static resources.
-
-## 📜 License
-
-This project is private and intended for personal use or as specified by the repository owner.
+Faith Frames is a professionally developed mobile application built using Expo and React Native. The application is designed to enhance spiritual engagement through daily devotional content, Bible reading, interactive quizzes, and a curated collection of inspirational wallpapers.
 
 ---
 
-*Made with ❤️ for spiritual growth.*
+## Table of Contents
+
+* Problem Statement
+* Solution
+* Key Features
+* Technical Stack
+* Architecture
+* Installation
+* Usage
+* Project Structure
+* Performance Optimization
+* Challenges
+* Learnings
+* Future Enhancements
+* Contribution
+* License
+* Author
+
+---
+
+## Problem Statement
+
+Maintaining consistency in spiritual practices such as daily Bible reading, prayer, and reflection can be difficult in a fast-paced digital environment. Existing solutions often lack interactivity, engagement, and a modern user experience.
+
+---
+
+## Solution
+
+Faith Frames addresses these challenges by providing a unified platform that integrates devotional content, interactive learning through quizzes, and visually engaging spiritual media. The application is designed with a focus on usability, performance, and scalability.
+
+---
+
+## Key Features
+
+* Daily verse and prayer content for consistent spiritual engagement
+* Integrated Bible reader with a clean and readable interface
+* Interactive quiz system with multiple categories and difficulty levels
+* High-quality wallpaper gallery with optimized image loading
+* Story-based and short-form content for enhanced engagement
+* Smooth animations and responsive user interface
+
+---
+
+## Technical Stack
+
+Frontend:
+
+* Expo (SDK 55)
+* React Native (0.83)
+* Expo Router
+
+State Management:
+
+* Redux Toolkit
+
+UI and Animation:
+
+* React Native Reanimated
+* Moti
+
+Performance:
+
+* FlashList for optimized list rendering
+
+---
+
+## Architecture
+
+The application follows a modular and scalable architecture:
+
+* Feature-based folder structure for maintainability
+* Centralized state management using Redux Toolkit
+* File-based routing using Expo Router
+* Reusable component-driven design
+
+---
+
+## Installation
+
+### Prerequisites
+
+* Node.js version 20 or above
+* Expo CLI
+* Android Studio or Xcode for emulator support
+
+### Steps
+
+```bash
+git clone https://github.com/BhanuPrakashPandey0843/Wallpaper-App.git
+cd faithframes
+npm install
+npx expo start
+```
+
+---
+
+## Usage
+
+* Launch the application using Expo
+* Navigate through daily devotional content
+* Access Bible reading modules
+* Participate in quizzes to test knowledge
+* Explore and download wallpapers
+
+---
+
+## Project Structure
+
+app/ – Navigation and routing
+src/components/ – Reusable UI components
+src/features/ – Feature-specific modules
+src/services/ – API and utility services
+src/store/ – State management
+src/theme/ – Styling and design system
+assets/ – Static resources
+
+---
+
+## Performance Optimization
+
+* Efficient rendering using FlashList
+* Optimized animations with Reanimated
+* Lazy loading of images and screens
+* Structured state management to minimize re-renders
+
+---
+
+## Challenges
+
+* Managing complex navigation flows with Expo Router
+* Ensuring performance with media-heavy content
+* Implementing smooth cross-platform animations
+* Maintaining scalable and clean architecture
+
+---
+
+## Learnings
+
+* Advanced React Native development practices
+* Performance optimization techniques for mobile applications
+* Effective use of animation libraries
+* Scalable state management using Redux Toolkit
+
+---
+
+## Future Enhancements
+
+* User authentication and personalization
+* Dark mode implementation
+* AI-based content recommendations
+* Multi-language support
+* Cloud synchronization
+
+---
+
+## Contribution
+
+Contributions are welcome. Please fork the repository and submit a pull request for any improvements.
+
+---
+
+## License
+
+This project is intended for personal or authorized use.
+
+---
+
+## Author
+
+Bhanu Pandey
+Email: [bhanupandey0843@gmail.com](mailto:bhanupandey0843@gmail.com)
+LinkedIn: https://www.linkedin.com/in/bhanu-prakash-pandey-67727b318/
+
+---
+
+## Live Demo
+
+To be added
