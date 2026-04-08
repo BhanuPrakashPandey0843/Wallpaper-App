@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getFloatingTabBarBottomOffset } from './floatingTabBarPadding';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme/radius';
 import { shadows } from '../../theme/shadows';
@@ -11,8 +13,11 @@ interface Props {
 }
 
 export default function CustomTabBar({ state, descriptors, navigation }: Props) {
+  const insets = useSafeAreaInsets();
+  const bottomOffset = getFloatingTabBarBottomOffset(insets.bottom);
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { bottom: bottomOffset }]}>
       <View style={styles.bar}>
         {state.routes.map((route: any, index: number) => {
           const { options } = descriptors[route.key];
@@ -68,7 +73,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 16,
     right: 16,
-    bottom: 24,
     alignItems: 'center',
   },
   bar: {

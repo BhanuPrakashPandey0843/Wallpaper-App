@@ -1,36 +1,37 @@
 import React, { useEffect } from "react";
-import { ActivityIndicator, View } from "react-native";
 import { useRouter } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { storage } from "../src/services/storage";
 import { AUTH_STORAGE_KEY, AuthSession } from "../src/features/auth/constants";
-import { colors } from "../src/theme/colors";
 
 export default function Index() {
   const router = useRouter();
 
   useEffect(() => {
     const bootstrap = async () => {
-      const session = await storage.get<AuthSession>(AUTH_STORAGE_KEY);
-      if (!session) {
+      try {
+        const session = await storage.get<AuthSession>(AUTH_STORAGE_KEY);
+        
+        // Determinate target first
+        let target: "/welcome" | "/(tabs)" | "/login" = "/welcome";
+        if (session) {
+          if (session.isAuthenticated) {
+            target = "/(tabs)";
+          } else if (session.hasOnboarded) {
+            target = "/login";
+          }
+        }
+
+        // Only hide splash AFTER redirect is triggered
+        await SplashScreen.hideAsync();
+        router.replace(target);
+      } catch (e) {
+        await SplashScreen.hideAsync();
         router.replace("/welcome");
-        return;
       }
-      if (session.isAuthenticated) {
-        router.replace("/(tabs)");
-        return;
-      }
-      if (session.hasOnboarded) {
-        router.replace("/login");
-        return;
-      }
-      router.replace("/welcome");
     };
     bootstrap();
   }, [router]);
 
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colors.background }}>
-      <ActivityIndicator size="small" color={colors.accent} />
-    </View>
-  );
+  return null;
 }

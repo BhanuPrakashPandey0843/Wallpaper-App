@@ -1,0 +1,23 @@
+/** Quiz module palette — matches premium dark + lime accent reference */
+export const quizTheme = {
+  bgDeep: '#0B0D12',
+  bgPanel: '#16181F',
+  surfaceCard: '#1E222B',
+  surfaceMuted: '#252A35',
+  lime: '#D4EF3A',
+  limeMuted: 'rgba(212, 239, 58, 0.15)',
+  textMuted: '#8B909E',
+  successBanner: '#4ADE80',
+  successBannerDeep: '#22C55E',
+  wrongBanner: '#F87171',
+  wrongBannerDeep: '#DC2626',
+  orangeCta: '#FF7043',
+  goldGlow: 'rgba(255, 215, 100, 0.45)',
+  purpleGlow: 'rgba(167, 139, 250, 0.4)',
+  orangeGlow: 'rgba(251, 146, 60, 0.45)',
+  letterA: '#A78BFA',
+  letterB: '#FBBF24',
+  letterC: '#4ADE80',
+  letterD: '#D4A574',
+  divider: 'rgba(255,255,255,0.06)',
+} as const;
