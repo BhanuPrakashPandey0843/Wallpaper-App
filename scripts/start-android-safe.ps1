@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$localGradleHome = Join-Path $projectRoot ".gradle-local"
+$localGradleHome = "D:\.g9-ff"
 
 New-Item -ItemType Directory -Force -Path $localGradleHome | Out-Null
 $env:GRADLE_USER_HOME = $localGradleHome

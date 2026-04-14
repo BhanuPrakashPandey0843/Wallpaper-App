@@ -17,28 +17,23 @@ export const useAppHeaderData = () => {
   const { data: coinData, isLoading: coinsLoading, isFetching: coinsFetching } = useGetUserCoinsQuery();
 
   useEffect(() => {
-    const hydrate = async () => {
+    const hydrateAndCache = async () => {
       const cachedProfile = await storage.get<typeof profileData>(CACHE_KEYS.profile);
       const cachedCoins = await storage.get<typeof coinData>(CACHE_KEYS.coins);
       if (cachedProfile) dispatch(setProfile(cachedProfile));
       if (cachedCoins) dispatch(setCoins(cachedCoins));
+
+      if (profileData) {
+        dispatch(setProfile(profileData));
+        storage.set(CACHE_KEYS.profile, profileData);
+      }
+      if (coinData) {
+        dispatch(setCoins(coinData));
+        storage.set(CACHE_KEYS.coins, coinData);
+      }
     };
-    hydrate();
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (profileData) {
-      dispatch(setProfile(profileData));
-      storage.set(CACHE_KEYS.profile, profileData);
-    }
-  }, [dispatch, profileData]);
-
-  useEffect(() => {
-    if (coinData) {
-      dispatch(setCoins(coinData));
-      storage.set(CACHE_KEYS.coins, coinData);
-    }
-  }, [dispatch, coinData]);
+    hydrateAndCache();
+  }, [dispatch, profileData, coinData]);
 
   const user = useAppSelector((s) => s.user.profile);
   const coins = useAppSelector((s) => s.user.coins);

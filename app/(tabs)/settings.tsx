@@ -6,8 +6,7 @@ import { spacing } from '../../src/theme/spacing';
 import { radius } from '../../src/theme/radius';
 import { shadows } from '../../src/theme/shadows';
 import Text from '../../src/components/ui/Text';
-import { AUTH_STORAGE_KEY, defaultAuthSession } from '../../src/features/auth/constants';
-import { storage } from '../../src/services/storage';
+import { useAuth } from '../../src/features/auth/hooks/useAuth';
 
 interface SettingItemProps {
   label: string;
@@ -29,6 +28,7 @@ const SettingItem: React.FC<SettingItemProps> = ({ label, onPress, isDestructive
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { logout } = useAuth();
 
   const onContactUs = async () => {
     const mailto = 'mailto:support@faithframes.app?subject=Faith%20Frames%20Support';
@@ -51,9 +51,22 @@ export default function SettingsScreen() {
     });
   };
 
-  const onLogout = async () => {
-    await storage.set(AUTH_STORAGE_KEY, defaultAuthSession);
-    router.replace('/login');
+  const handleLogout = async () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Logout', 
+          style: 'destructive',
+          onPress: async () => {
+            await logout();
+            router.replace('/welcome');
+          }
+        },
+      ]
+    );
   };
 
   return (
@@ -63,7 +76,7 @@ export default function SettingsScreen() {
           Account
         </Text>
         <View style={styles.card}>
-          <SettingItem label="Account" onPress={() => router.push('/settings/account')} />
+          <SettingItem label="Account" onPress={() => router.push('/settings-view/account')} />
         </View>
       </View>
 
@@ -72,9 +85,9 @@ export default function SettingsScreen() {
           Personalization
         </Text>
         <View style={styles.card}>
-          <SettingItem label="Wallpaper Settings" onPress={() => router.push('/settings/wallpaper-settings')} />
-          <SettingItem label="Downloads" onPress={() => router.push('/settings/downloads')} />
-          <SettingItem label="Favorites" onPress={() => router.push('/settings/favorites')} />
+          <SettingItem label="Wallpaper Settings" onPress={() => router.push('/settings-view/wallpaper-settings')} />
+          <SettingItem label="Downloads" onPress={() => router.push('/settings-view/downloads')} />
+          <SettingItem label="Favorites" onPress={() => router.push('/settings-view/favorites')} />
         </View>
       </View>
 
@@ -94,14 +107,14 @@ export default function SettingsScreen() {
           Legal
         </Text>
         <View style={styles.card}>
-          <SettingItem label="Privacy Policy" onPress={() => router.push('/settings/privacy-policy')} />
-          <SettingItem label="Terms & Conditions" onPress={() => router.push('/settings/terms')} />
+          <SettingItem label="Privacy Policy" onPress={() => router.push('/settings-view/privacy-policy')} />
+          <SettingItem label="Terms & Conditions" onPress={() => router.push('/settings-view/terms')} />
         </View>
       </View>
 
       <View style={styles.section}>
         <View style={styles.card}>
-          <SettingItem label="Logout" isDestructive onPress={onLogout} />
+          <SettingItem label="Logout" isDestructive onPress={handleLogout} />
         </View>
       </View>
     </ScrollView>
@@ -114,26 +127,29 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   content: {
-    padding: spacing.lg,
-    paddingBottom: 120,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xl,
+    gap: spacing.lg,
   },
   section: {
-    marginBottom: spacing.lg,
+    gap: spacing.sm,
   },
   card: {
-    marginTop: spacing.sm,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
-    paddingVertical: spacing.xs,
+    overflow: 'hidden',
     ...shadows.sm,
   },
   itemTouchable: {
-    borderRadius: radius.lg,
-    overflow: 'hidden',
+    width: '100%',
   },
   item: {
+    minHeight: 52,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
-    borderBottomWidth: 0,
+    justifyContent: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.surfaceElevated,
   },
 });

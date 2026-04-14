@@ -134,39 +134,46 @@ export function useQuizController() {
     return true;
   }, []);
 
+  const resetAndStartQuiz = useCallback(
+    (selectedQuestions: QuizQuestion[], useTimerSetting: boolean) => {
+      setSetupError(null);
+      setPendingResume(null);
+      void savePersistedSession(null);
+      setQuestions(selectedQuestions);
+      setCurrentIndex(0);
+      setCorrectCount(0);
+      setSelectedOption(null);
+      setRevealed(false);
+      setTimedOut(false);
+      setTotalTimeSeconds(0);
+      setQuestionStartedAt(Date.now());
+      timerResetToken.current += 1;
+      setStep('question');
+      finishingRef.current = false;
+      void savePersistedSession({
+        bankVersion: QUESTIONS_BANK_VERSION,
+        questionIds: selectedQuestions.map((q) => q.id),
+        currentIndex: 0,
+        correctCount: 0,
+        selectedOption: null,
+        revealed: false,
+        timedOut: false,
+        totalTimeSeconds: 0,
+        useTimer: useTimerSetting,
+        timerSeconds: DEFAULT_TIMER_SECONDS,
+      });
+    },
+    []
+  );
+
   const startQuiz = useCallback(() => {
     const selected = selectQuizQuestions(QUIZ_QUESTIONS, category, difficulty, questionCount);
     if (selected.length === 0) {
       setSetupError('No questions found for this category and difficulty.');
       return;
     }
-    setSetupError(null);
-    setPendingResume(null);
-    void savePersistedSession(null);
-    setQuestions(selected);
-    setCurrentIndex(0);
-    setCorrectCount(0);
-    setSelectedOption(null);
-    setRevealed(false);
-    setTimedOut(false);
-    setTotalTimeSeconds(0);
-    setQuestionStartedAt(Date.now());
-    timerResetToken.current += 1;
-    setStep('question');
-    finishingRef.current = false;
-    void savePersistedSession({
-      bankVersion: QUESTIONS_BANK_VERSION,
-      questionIds: selected.map((q) => q.id),
-      currentIndex: 0,
-      correctCount: 0,
-      selectedOption: null,
-      revealed: false,
-      timedOut: false,
-      totalTimeSeconds: 0,
-      useTimer,
-      timerSeconds: DEFAULT_TIMER_SECONDS,
-    });
-  }, [category, difficulty, questionCount, useTimer]);
+    resetAndStartQuiz(selected, useTimer);
+  }, [category, difficulty, questionCount, useTimer, resetAndStartQuiz]);
 
   const resumeQuiz = useCallback(() => {
     if (!pendingResume) return;
@@ -261,32 +268,7 @@ export function useQuizController() {
       setSetupError('Daily challenge is temporarily unavailable.');
       return;
     }
-    setSetupError(null);
-    setPendingResume(null);
-    void savePersistedSession(null);
-    setQuestions(selected);
-    setCurrentIndex(0);
-    setCorrectCount(0);
-    setSelectedOption(null);
-    setRevealed(false);
-    setTimedOut(false);
-    setTotalTimeSeconds(0);
-    setQuestionStartedAt(Date.now());
-    timerResetToken.current += 1;
-    setStep('question');
-    finishingRef.current = false;
-    void savePersistedSession({
-      bankVersion: QUESTIONS_BANK_VERSION,
-      questionIds: selected.map((q) => q.id),
-      currentIndex: 0,
-      correctCount: 0,
-      selectedOption: null,
-      revealed: false,
-      timedOut: false,
-      totalTimeSeconds: 0,
-      useTimer: true,
-      timerSeconds: DEFAULT_TIMER_SECONDS,
-    });
+    resetAndStartQuiz(selected, true);
   }, []);
 
   const badge =

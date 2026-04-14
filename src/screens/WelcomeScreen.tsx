@@ -30,23 +30,23 @@ const { width, height } = Dimensions.get("window");
 const SLIDES = [
   {
     id: "1",
-    title: "Discover Stories from\nIslamic History",
+    title: "Daily Inspiration\nin Your Pocket",
     subtitle:
-      "Listen to beautiful audio stories of Prophets and\nheroes of Islam — made just for kids!",
+      "Receive a fresh Bible verse every day to start\nyour morning with peace and faith.",
     image: require("../../assets/ooks.png"),
   },
   {
     id: "2",
-    title: "Fun Quizzes After\nEach Story",
+    title: "Test Your\nBible Knowledge",
     subtitle:
-      "Unlock quizzes after listening to test what you’ve\nlearned — smart and exciting!",
+      "Engage with interactive quizzes designed to\nstrengthen your understanding of Scripture.",
     image: require("../../assets/reelo.png"),
   },
   {
     id: "3",
-    title: "Grow with\nRewards",
+    title: "Beautiful\nFaith Wallpapers",
     subtitle:
-      "Earn points, unlock badges, and see your learning\njourney come to life!",
+      "Personalize your device with a curated collection\nof high-quality Christian wallpapers.",
     image: require("../../assets/pattern.png"),
   },
 ];

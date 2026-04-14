@@ -5,14 +5,15 @@ import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { SectionHeader } from '../../../components/composites/SectionHeader';
-import { Svg, Path } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../../theme/colors';
 import Text from '../../../components/ui/Text';
 import { useRouter } from 'expo-router';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const REEL_SIZE = SCREEN_WIDTH - 32; // Hardcoded spacing.md * 2
+const REEL_WIDTH = SCREEN_WIDTH - 32;
+const REEL_HEIGHT = 200; // Optimized height to allow ~3 items to fit better vertically
 
 interface Reel {
   id: string;
@@ -58,12 +59,12 @@ const ReelCard = React.memo(({ item, onPress }: { item: Reel; onPress: () => voi
           />
           <View style={styles.bulgeContainer}>
             <Svg
-              width={REEL_SIZE}
-              height={40}
-              viewBox={`0 0 ${REEL_SIZE} 40`}
+              width={REEL_WIDTH}
+              height={30}
+              viewBox={`0 0 ${REEL_WIDTH} 30`}
             >
               <Path
-                d={`M0 0 Q${REEL_SIZE / 2} 40 ${REEL_SIZE} 0 L${REEL_SIZE} 40 L0 40 Z`}
+                d={`M0 0 Q${REEL_WIDTH / 2} 30 ${REEL_WIDTH} 0 L${REEL_WIDTH} 30 L0 30 Z`}
                 fill={colors.background}
               />
             </Svg>
@@ -71,7 +72,7 @@ const ReelCard = React.memo(({ item, onPress }: { item: Reel; onPress: () => voi
           
           <View style={styles.playOverlay}>
             <View style={styles.playIconContainer}>
-              <Ionicons name="play" size={28} color="#FFF" style={{ marginLeft: 4 }} />
+              <Ionicons name="play" size={32} color="#FFF" style={{ marginLeft: 4 }} />
             </View>
           </View>
         </View>
@@ -97,22 +98,24 @@ const ProphetReelsSection: React.FC<Props> = ({ reels, onOpen, loading }) => {
       <SectionHeader title="Prophet Reels" />
       {loading ? (
         <View style={styles.content}>
-          {Array.from({ length: 4 }).map((_, i) => (
+          {Array.from({ length: 3 }).map((_, i) => (
             <View key={`reel-skeleton-${i}`} style={styles.skeleton} />
           ))}
         </View>
       ) : (
-        <FlashList
-          data={reels}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          contentContainerStyle={styles.content}
-          ListFooterComponent={() => (
-            <Pressable style={styles.viewMoreButton} onPress={() => router.push('/(tabs)/library')}>
-              <Text style={styles.viewMoreText}>View More</Text>
-            </Pressable>
-          )}
-        />
+        <View style={styles.content}>
+          <FlashList
+            data={reels}
+            keyExtractor={keyExtractor}
+            renderItem={renderItem}
+            numColumns={1}
+            estimatedItemSize={REEL_HEIGHT + 40}
+            contentContainerStyle={styles.listContent}
+          />
+          <Pressable style={styles.viewMoreButton} onPress={() => router.push('/(tabs)/library')}>
+            <Text style={styles.viewMoreText}>View More</Text>
+          </Pressable>
+        </View>
       )}
     </View>
   );
@@ -125,6 +128,9 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 16,
   },
+  listContent: {
+    paddingBottom: 8,
+  },
   cardContainer: {
     width: '100%',
     marginBottom: 24,
@@ -135,9 +141,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imageWrapper: {
-    width: REEL_SIZE,
-    height: REEL_SIZE,
-    borderRadius: 32,
+    width: REEL_WIDTH,
+    height: REEL_HEIGHT,
+    borderRadius: 24,
     backgroundColor: '#2C2C2C',
     position: 'relative',
     overflow: 'hidden',
@@ -151,7 +157,7 @@ const styles = StyleSheet.create({
     bottom: -1,
     left: 0,
     right: 0,
-    height: 40,
+    height: 30,
   },
   playOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -160,9 +166,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.15)',
   },
   playIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     backgroundColor: 'rgba(255,255,255,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -170,28 +176,28 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.5)',
   },
   cardTitle: {
-    marginTop: 12,
+    marginTop: 10,
     color: '#FFFFFF',
     width: '100%',
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 15,
   },
   skeleton: {
-    width: '100%',
-    height: REEL_SIZE,
+    width: REEL_WIDTH,
+    height: REEL_HEIGHT,
     marginBottom: 24,
-    borderRadius: 32,
+    borderRadius: 24,
     backgroundColor: '#2C2C2C',
   },
   viewMoreButton: {
     width: '100%',
-    height: 56,
+    height: 52,
     backgroundColor: '#FF7D33',
-    borderRadius: 28,
+    borderRadius: 26,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 32,
+    marginTop: 8,
+    marginBottom: 16,
   },
   viewMoreText: {
     color: '#fff',

@@ -8,6 +8,8 @@ import { spacing } from '../../theme/spacing';
 import { radius } from '../../theme/radius';
 import { colors } from '../../theme/colors';
 
+import { debounce } from '../../utils/debounce';
+
 interface Props {
   placeholder?: string;
   onSearch?: (text: string) => void;
@@ -19,6 +21,13 @@ export const SearchBar: React.FC<Props> = React.memo(
     const [value, setValue] = useState('');
     const [isFocused, setIsFocused] = useState(false);
     
+    const debouncedSearch = useCallback(
+      debounce((text: string) => {
+        onSearch?.(text);
+      }, 300),
+      [onSearch]
+    );
+
     const micScale = useSharedValue(1);
     const micAnimatedStyle = useAnimatedStyle(() => ({
       transform: [{ scale: micScale.value }]
@@ -26,8 +35,8 @@ export const SearchBar: React.FC<Props> = React.memo(
 
     const onChangeText = useCallback((text: string) => {
       setValue(text);
-      onSearch?.(text);
-    }, [onSearch]);
+      debouncedSearch(text);
+    }, [debouncedSearch]);
 
     const onClear = useCallback(() => {
       setValue('');

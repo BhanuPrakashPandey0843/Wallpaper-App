@@ -12,7 +12,7 @@ interface Props {
   navigation: any;
 }
 
-export default function CustomTabBar({ state, descriptors, navigation }: Props) {
+export default React.memo(function CustomTabBar({ state, descriptors, navigation }: Props) {
   const insets = useSafeAreaInsets();
   const bottomOffset = getFloatingTabBarBottomOffset(insets.bottom);
 
@@ -66,7 +66,7 @@ export default function CustomTabBar({ state, descriptors, navigation }: Props) 
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

@@ -20,7 +20,7 @@ type CarouselProps = {
   autoPlayIntervalMs?: number;
 };
 
-const AnimatedDot = ({ 
+const AnimatedDot = React.memo(({ 
   index, 
   progress 
 }: { 

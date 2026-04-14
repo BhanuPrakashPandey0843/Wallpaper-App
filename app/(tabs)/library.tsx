@@ -74,6 +74,32 @@ export default function LibraryScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      <View style={styles.section}>
+        <Text variant="sm" color="textSecondary">
+          Community & Inspiration
+        </Text>
+        <View style={styles.inspirationGrid}>
+          <TouchableOpacity style={styles.gridItem} onPress={() => router.push('/library/meet-share')}>
+            <Card elevated style={styles.gridCard}>
+              <Text variant="sm" bold>Meet Sessions</Text>
+              <Text variant="xs" color="textSecondary">Live Faith Circles</Text>
+            </Card>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.gridItem} onPress={() => router.push('/library/witness')}>
+            <Card elevated style={styles.gridCard}>
+              <Text variant="sm" bold>The Witness</Text>
+              <Text variant="xs" color="textSecondary">Faith Stories</Text>
+            </Card>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.gridItem} onPress={() => router.push('/library/gods-words')}>
+            <Card elevated style={styles.gridCard}>
+              <Text variant="sm" bold>God's Words</Text>
+              <Text variant="xs" color="textSecondary">Divine Insights</Text>
+            </Card>
+          </TouchableOpacity>
+        </View>
+      </View>
     </ScrollView>
   );
 }
@@ -93,25 +119,41 @@ const styles = StyleSheet.create({
   sectionRow: {
     flexDirection: 'row',
     gap: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  half: {
+    flex: 1,
+  },
+  inspirationGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  gridItem: {
+    width: '31%',
+  },
+  gridCard: {
+    padding: spacing.sm,
+    borderRadius: radius.md,
+    height: 80,
+    justifyContent: 'center',
   },
   largeCard: {
     marginTop: spacing.sm,
     padding: spacing.md,
     borderRadius: radius.lg,
-    ...shadows.md,
   },
   mediumCard: {
     marginTop: spacing.sm,
     padding: spacing.md,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
   },
   smallCard: {
     marginTop: spacing.sm,
     padding: spacing.md,
-    borderRadius: radius.md,
-  },
-  half: {
-    flex: 1,
+    borderRadius: radius.lg,
+    height: 100,
   },
   mtSm: {
     marginTop: spacing.sm,

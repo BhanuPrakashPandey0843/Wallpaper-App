@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { View, StyleSheet, ScrollView, Image } from 'react-native';
 import { spacing } from '../../theme/spacing';
 import { colors } from '../../theme/colors';
@@ -8,62 +8,14 @@ import { CategoriesSection } from './components/CategoriesSection';
 import { ProphetStoriesSection } from './components/ProphetStoriesSection';
 import ProphetReelsSection from './components/ProphetReelsSection';
 import { useRouter } from 'expo-router';
+import { useGetProphetStoriesQuery, useGetProphetReelsQuery } from '../../store/api/storiesApi';
 
 export default function HomeScreen() {
   const router = useRouter();
   const pattern = require('../../../assets/pattern.png');
 
-  const prophetStories = useMemo(
-    () => [
-      {
-        id: 'p1',
-        title: 'Prophet Yunus (AS) & The Whale',
-        image: require('../../../assets/caroselfour.png'),
-      },
-      {
-        id: 'p2',
-        title: 'Prophet Yusuf (AS) in Egypt',
-        image: require('../../../assets/caroselfive.png'),
-      },
-      {
-        id: 'p3',
-        title: 'Prophet Stories III',
-        image: require('../../../assets/caroselsix.png'),
-      },
-      {
-        id: 'p4',
-        title: 'Prophet Stories IV',
-        image: require('../../../assets/caroseltwo.png'),
-      },
-    ],
-    []
-  );
-
-  const prophetReels = useMemo(
-    () => [
-      {
-        id: 'r1',
-        title: 'Daily Verse',
-        image: require('../../../assets/Post de Instagram Versículo de la Biblia  Minimalista Beige.png'),
-      },
-      {
-        id: 'r2',
-        title: 'Prophet Stories',
-        image: require('../../../assets/reelo.png'),
-      },
-      {
-        id: 'r3',
-        title: 'Wisdom',
-        image: require('../../../assets/tempa.png'),
-      },
-      {
-        id: 'r4',
-        title: 'Knowledge',
-        image: require('../../../assets/ooks.png'),
-      },
-    ],
-    []
-  );
+  const { data: prophetStories = [] } = useGetProphetStoriesQuery();
+  const { data: prophetReels = [] } = useGetProphetReelsQuery();
 
   const onCategorySelect = useCallback(
     (id: string) => {
