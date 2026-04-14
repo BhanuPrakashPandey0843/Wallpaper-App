@@ -15,4 +15,8 @@ export const colors = {
   borderTranslucent: 'rgba(255,255,255,0.1)',
   goldStart: '#FFE000',
   goldEnd: '#FFB800',
+  primary: '#F4792B', // Main brand color
+  white: '#FFFFFF',
+  error: '#FF4B4B',
+  border: '#E5E7EB',
 };

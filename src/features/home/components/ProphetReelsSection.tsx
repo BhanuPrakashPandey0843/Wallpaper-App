@@ -109,7 +109,6 @@ const ProphetReelsSection: React.FC<Props> = ({ reels, onOpen, loading }) => {
             keyExtractor={keyExtractor}
             renderItem={renderItem}
             numColumns={1}
-            estimatedItemSize={REEL_HEIGHT + 40}
             contentContainerStyle={styles.listContent}
           />
           <Pressable style={styles.viewMoreButton} onPress={() => router.push('/(tabs)/library')}>

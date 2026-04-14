@@ -40,7 +40,7 @@ const AnimatedDot = React.memo(({
       style={[styles.dot, animatedDotStyle]}
     />
   );
-};
+});
 
 export const Carousel: React.FC<CarouselProps> = ({
   images,

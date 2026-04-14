@@ -49,7 +49,11 @@
       "googleExpoClientId": "",
       "googleIosClientId": "",
       "googleAndroidClientId": "",
-      "googleWebClientId": ""
+      "googleWebClientId": "",
+      "router": {},
+      "eas": {
+        "projectId": "f839d8d3-4489-4833-8c80-98a316393426"
+      }
     }
   }
 }
