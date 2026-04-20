@@ -63,6 +63,12 @@ function NavigationLayout() {
       router.replace('/welcome');
     } else if (user && (inAuthGroup || isWelcome)) {
       router.replace('/(tabs)');
+    } else if (user && segments.length === 0) {
+      // If we are at the root index and user is logged in
+      router.replace('/(tabs)');
+    } else if (!user && segments.length === 0) {
+      // If we are at the root index and user is NOT logged in
+      router.replace('/welcome');
     }
   }, [user, isInitialized, segments, router]);
 
@@ -100,6 +106,9 @@ function NavigationLayout() {
       <Stack.Screen name="settings-view/favorites" />
       <Stack.Screen name="settings-view/privacy-policy" />
       <Stack.Screen name="settings-view/terms" />
+      <Stack.Screen name="settings-view/rate-app" />
+      <Stack.Screen name="settings-view/share" />
+      <Stack.Screen name="settings-view/contact-us" />
     </Stack>
   );
 }

@@ -11,7 +11,7 @@ import {
   NativeScrollEvent,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { WavyCurve } from "../components/ui/WavyCurve";
+
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -33,21 +33,21 @@ const SLIDES = [
     title: "Daily Inspiration\nin Your Pocket",
     subtitle:
       "Receive a fresh Bible verse every day to start\nyour morning with peace and faith.",
-    image: require("../../assets/ooks.png"),
+    image: require("../../assets/caroscrone.png"),
   },
   {
     id: "2",
     title: "Test Your\nBible Knowledge",
     subtitle:
       "Engage with interactive quizzes designed to\nstrengthen your understanding of Scripture.",
-    image: require("../../assets/reelo.png"),
+    image: require("../../assets/caroscrtwo.png"),
   },
   {
     id: "3",
     title: "Beautiful\nFaith Wallpapers",
     subtitle:
       "Personalize your device with a curated collection\nof high-quality Christian wallpapers.",
-    image: require("../../assets/pattern.png"),
+    image: require("../../assets/caroscrthr.png"),
   },
 ];
 
@@ -107,32 +107,18 @@ export default function WelcomeScreen() {
     router.push("/signup");
   };
 
-  const handleContinue = () => {
-    if (currentIndex < SLIDES.length - 1) {
-      flatListRef.current?.scrollToIndex({
-        index: currentIndex + 1,
-        animated: true,
-      });
-    } else {
-      persistOnboardedAndNavigate();
-    }
+  const handleLogin = () => {
+    router.push("/login");
   };
 
-  const handleSkip = () => {
-    persistOnboardedAndNavigate();
+  const handleSignup = () => {
+    router.push("/signup");
   };
 
   const renderItem = ({ item, index }: { item: typeof SLIDES[0]; index: number }) => {
     return (
       <View style={styles.slide}>
-        <View style={styles.imageContainer}>
-          <Image source={item.image} style={styles.image} resizeMode="cover" />
-          <WavyCurve width={width} color="#FFFBF0" />
-        </View>
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.subtitle}>{item.subtitle}</Text>
-        </View>
+        <Image source={item.image} style={styles.carouselImage} resizeMode="cover" />
       </View>
     );
   };
@@ -141,13 +127,6 @@ export default function WelcomeScreen() {
     <View style={styles.container}>
       <StatusBar style="dark" />
       
-      {/* SKIP BUTTON */}
-      {currentIndex < SLIDES.length - 1 && (
-        <Pressable onPress={handleSkip} style={styles.skipButton}>
-          <Text style={styles.skipText}>Skip</Text>
-        </Pressable>
-      )}
-
       {/* CAROUSEL */}
       <FlatList
         ref={flatListRef}
@@ -169,13 +148,14 @@ export default function WelcomeScreen() {
             <PaginationDot key={index} index={index} scrollX={scrollX} />
           ))}
         </View>
-
-        {/* CONTINUE BUTTON */}
-        <Pressable onPress={handleContinue} style={styles.continueButton}>
-          <Text style={styles.continueButtonText}>
-            {currentIndex === SLIDES.length - 1 ? "Get Started" : "Continue"}
-          </Text>
-        </Pressable>
+        <View style={styles.buttonContainer}>
+          <Pressable onPress={handleLogin} style={styles.button}>
+            <Text style={styles.buttonText}>Login</Text>
+          </Pressable>
+          <Pressable onPress={handleSignup} style={styles.signupButton}>
+            <Text style={styles.signupButtonText}>Sign Up</Text>
+          </Pressable>
+        </View>
       </SafeAreaView>
     </View>
   );
@@ -184,59 +164,23 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFBF0", // Warm cream/beige from image
-  },
-  skipButton: {
-    position: "absolute",
-    top: 60,
-    right: 24,
-    zIndex: 10,
-  },
-  skipText: {
-    fontSize: 16,
-    color: "#000",
-    fontWeight: "500",
+    backgroundColor: "#121212", // Dark background matching app theme
   },
   slide: {
     width: width,
     flex: 1,
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "center",
   },
-  imageContainer: {
-    width: width,
-    height: height * 0.55,
-    overflow: "hidden",
-  },
-  image: {
+  carouselImage: {
     width: "100%",
     height: "100%",
-  },
-  textContainer: {
-    paddingHorizontal: 40,
-    alignItems: "center",
-    marginTop: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#1A1A1A",
-    textAlign: "center",
-    lineHeight: 36,
-    marginBottom: 16,
-    fontFamily: "Poppins_700Bold", // Use Poppins if available, otherwise default
-  },
-  subtitle: {
-    fontSize: 15,
-    color: "#666666",
-    textAlign: "center",
-    lineHeight: 22,
-    fontFamily: "Poppins_400Regular",
   },
   bottomContainer: {
     paddingHorizontal: 24,
     paddingBottom: 40,
     alignItems: "center",
+    backgroundColor: "#121212",
   },
   paginationContainer: {
     flexDirection: "row",
@@ -244,18 +188,28 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
   dot: {
-    height: 6,
-    width: 10,
-    borderRadius: 3,
-    backgroundColor: "#F4792B", // Active color from image
-    marginHorizontal: 4,
+    height: 8,
+    width: 8,
+    borderRadius: 4,
+    backgroundColor: "#F4792B",
+    marginHorizontal: 6,
   },
   activeDot: {
     backgroundColor: "#F4792B",
   },
-  continueButton: {
+  buttonContainer: {
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    width: "100%",
+    gap: 12,
+  },
+  button: {
     width: "100%",
     height: 56,
     backgroundColor: "#F4792B",
@@ -264,12 +218,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     shadowColor: "#F4792B",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 8,
   },
-  continueButtonText: {
+  buttonText: {
     color: "#fff",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  signupButton: {
+    width: "100%",
+    height: 56,
+    backgroundColor: "transparent",
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#F4792B",
+  },
+  signupButtonText: {
+    color: "#F4792B",
     fontSize: 18,
     fontWeight: "600",
   },

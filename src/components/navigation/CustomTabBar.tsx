@@ -5,6 +5,7 @@ import { getFloatingTabBarBottomOffset } from './floatingTabBarPadding';
 import { colors } from '../../theme/colors';
 import { radius } from '../../theme/radius';
 import { shadows } from '../../theme/shadows';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 interface Props {
   state: any;
@@ -37,7 +38,8 @@ export default React.memo(function CustomTabBar({ state, descriptors, navigation
               onPress={onPress}
               style={[
                 styles.item,
-                isQuiz && styles.quizItem
+                isQuiz && styles.quizItem,
+                isFocused && !isQuiz && styles.focusedItem
               ]}
             >
               {options.tabBarIcon
@@ -93,6 +95,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 4,
     flex: 1,
+  },
+  focusedItem: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 16,
   },
   quizItem: {
     backgroundColor: colors.accent,

@@ -30,25 +30,16 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { logout } = useAuth();
 
-  const onContactUs = async () => {
-    const mailto = 'mailto:support@faithframes.app?subject=Faith%20Frames%20Support';
-    const canOpen = await Linking.canOpenURL(mailto);
-    if (canOpen) {
-      await Linking.openURL(mailto);
-    } else {
-      Alert.alert('Contact', 'Email app is not available on this emulator.');
-    }
+  const onContactUs = () => {
+    router.push('/settings-view/contact-us');
   };
 
-  const onRateApp = async () => {
-    const url = 'https://example.com/faith-frames-rate';
-    await Linking.openURL(url);
+  const onRateApp = () => {
+    router.push('/settings-view/rate-app');
   };
 
-  const onShareApp = async () => {
-    await Share.share({
-      message: 'Faith Frames - Christian wallpapers, Bible, and daily quiz. https://example.com/faith-frames',
-    });
+  const onShareApp = () => {
+    router.push('/settings-view/share');
   };
 
   const handleLogout = async () => {
