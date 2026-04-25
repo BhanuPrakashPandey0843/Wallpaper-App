@@ -2,18 +2,20 @@ import React, { useCallback } from 'react';
 import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Play } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { SectionHeader } from '../../../components/composites/SectionHeader';
-import Svg, { Path } from 'react-native-svg';
-import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../../theme/colors';
+import { spacing } from '../../../theme/spacing';
+import { radius } from '../../../theme/radius';
 import Text from '../../../components/ui/Text';
-import { useRouter } from 'expo-router';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const REEL_WIDTH = SCREEN_WIDTH - 32;
-const REEL_HEIGHT = 200; // Optimized height to allow ~3 items to fit better vertically
+const REEL_WIDTH = SCREEN_WIDTH * 0.85;
+const REEL_HEIGHT = 180;
 
 interface Reel {
   id: string;
@@ -34,12 +36,12 @@ const ReelCard = React.memo(({ item, onPress }: { item: Reel; onPress: () => voi
   }));
 
   const onPressIn = () => {
-    scale.value = withSpring(0.96, { damping: 10 });
+    scale.value = withSpring(0.98, { damping: 15 });
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const onPressOut = () => {
-    scale.value = withSpring(1, { damping: 10 });
+    scale.value = withSpring(1, { damping: 15 });
   };
 
   return (
@@ -50,43 +52,38 @@ const ReelCard = React.memo(({ item, onPress }: { item: Reel; onPress: () => voi
       style={styles.cardContainer}
     >
       <Animated.View style={[styles.cardContent, animatedStyle]}>
-        <View style={styles.imageWrapper}>
-          <Image
-            source={item.image}
-            contentFit="cover"
-            style={styles.image}
-            transition={300}
-          />
-          <View style={styles.bulgeContainer}>
-            <Svg
-              width={REEL_WIDTH}
-              height={30}
-              viewBox={`0 0 ${REEL_WIDTH} 30`}
-            >
-              <Path
-                d={`M0 0 Q${REEL_WIDTH / 2} 30 ${REEL_WIDTH} 0 L${REEL_WIDTH} 30 L0 30 Z`}
-                fill={colors.background}
-              />
-            </Svg>
-          </View>
+        <Image
+          source={item.image}
+          contentFit="cover"
+          style={styles.image}
+          transition={400}
+        />
+        
+        <LinearGradient
+          colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.7)']}
+          style={StyleSheet.absoluteFill}
+        />
+
+        <View style={styles.overlay}>
+          <BlurView intensity={20} tint="light" style={styles.playBtn}>
+            <Play size={20} color="#FFF" fill="#FFF" />
+          </BlurView>
           
-          <View style={styles.playOverlay}>
-            <View style={styles.playIconContainer}>
-              <Ionicons name="play" size={32} color="#FFF" style={{ marginLeft: 4 }} />
-            </View>
+          <View style={styles.textContainer}>
+            <Text variant="sm" bold style={styles.cardTitle} numberOfLines={1}>
+              {item.title}
+            </Text>
+            <Text variant="xs" style={styles.subtitle}>Watch Now</Text>
           </View>
         </View>
-        <Text variant="sm" bold style={styles.cardTitle} numberOfLines={1}>
-          {item.title}
-        </Text>
+
+        <View style={styles.rimLight} />
       </Animated.View>
     </Pressable>
   );
 });
 
-const ProphetReelsSection: React.FC<Props> = ({ reels, onOpen, loading }) => {
-  const router = useRouter();
-  
+export const ProphetReelsSection: React.FC<Props> = ({ reels, onOpen, loading }) => {
   const renderItem = useCallback(({ item }: { item: Reel }) => (
     <ReelCard item={item} onPress={() => onOpen(item.id)} />
   ), [onOpen]);
@@ -95,26 +92,24 @@ const ProphetReelsSection: React.FC<Props> = ({ reels, onOpen, loading }) => {
 
   return (
     <View style={styles.container}>
-      <SectionHeader title="Prophet Reels" />
+      <View style={styles.headerContainer}>
+        <SectionHeader title="Faith Reels" />
+      </View>
       {loading ? (
         <View style={styles.content}>
-          {Array.from({ length: 3 }).map((_, i) => (
-            <View key={`reel-skeleton-${i}`} style={styles.skeleton} />
-          ))}
+          <View style={[styles.skeleton, { width: REEL_WIDTH, height: REEL_HEIGHT }]} />
         </View>
       ) : (
-        <View style={styles.content}>
-          <FlashList
-            data={reels}
-            keyExtractor={keyExtractor}
-            renderItem={renderItem}
-            numColumns={1}
-            contentContainerStyle={styles.listContent}
-          />
-          <Pressable style={styles.viewMoreButton} onPress={() => router.push('/(tabs)/library')}>
-            <Text style={styles.viewMoreText}>View More</Text>
-          </Pressable>
-        </View>
+        <FlashList
+          data={reels}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.content}
+          estimatedItemSize={REEL_WIDTH}
+          decelerationRate="fast"
+        />
       )}
     </View>
   );
@@ -122,87 +117,77 @@ const ProphetReelsSection: React.FC<Props> = ({ reels, onOpen, loading }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 16,
+    marginBottom: spacing.xl,
+  },
+  headerContainer: {
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
   },
   content: {
-    paddingHorizontal: 16,
-  },
-  listContent: {
-    paddingBottom: 8,
+    paddingLeft: spacing.lg,
+    paddingRight: spacing.md,
   },
   cardContainer: {
-    width: '100%',
-    marginBottom: 24,
-    alignItems: 'center',
+    width: REEL_WIDTH,
+    height: REEL_HEIGHT,
+    marginRight: spacing.md,
+    borderRadius: radius.xl,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   cardContent: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  imageWrapper: {
-    width: REEL_WIDTH,
-    height: REEL_HEIGHT,
-    borderRadius: 24,
-    backgroundColor: '#2C2C2C',
-    position: 'relative',
-    overflow: 'hidden',
+    flex: 1,
   },
   image: {
-    width: '100%',
-    height: '100%',
-  },
-  bulgeContainer: {
-    position: 'absolute',
-    bottom: -1,
-    left: 0,
-    right: 0,
-    height: 30,
-  },
-  playOverlay: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.15)',
   },
-  playIconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    justifyContent: 'center',
+  overlay: {
+    flex: 1,
+    padding: spacing.lg,
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  playBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.5)',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  textContainer: {
+    flex: 1,
+    marginLeft: spacing.md,
   },
   cardTitle: {
-    marginTop: 10,
-    color: '#FFFFFF',
-    width: '100%',
-    textAlign: 'center',
-    fontSize: 15,
+    color: '#FFF',
+    fontSize: 16,
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    color: colors.accent,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginTop: 2,
+  },
+  rimLight: {
+    ...StyleSheet.absoluteFillObject,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: radius.xl,
+    pointerEvents: 'none',
   },
   skeleton: {
-    width: REEL_WIDTH,
-    height: REEL_HEIGHT,
-    marginBottom: 24,
-    borderRadius: 24,
-    backgroundColor: '#2C2C2C',
-  },
-  viewMoreButton: {
-    width: '100%',
-    height: 52,
-    backgroundColor: '#FF7D33',
-    borderRadius: 26,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 16,
-  },
-  viewMoreText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    borderRadius: radius.xl,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
 });
 
-export default React.memo(ProphetReelsSection);
+export default ProphetReelsSection;

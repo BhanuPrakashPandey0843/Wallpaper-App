@@ -63,13 +63,16 @@ function NavigationLayout() {
       router.replace('/welcome');
     } else if (user && (inAuthGroup || isWelcome)) {
       router.replace('/(tabs)');
-    } else if (user && segments.length === 0) {
+    } else if (user && segments.length < 1) {
       // If we are at the root index and user is logged in
       router.replace('/(tabs)');
-    } else if (!user && segments.length === 0) {
+    } else if (!user && segments.length < 1) {
       // If we are at the root index and user is NOT logged in
       router.replace('/welcome');
     }
+
+    // Hide splash screen once we've handled the initial redirect
+    void SplashScreen.hideAsync().catch(() => {});
   }, [user, isInitialized, segments, router]);
 
   return (

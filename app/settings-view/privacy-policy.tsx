@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   introText: {
     textAlign: 'center',
     lineHeight: 24,
-    color: COLORS.deepTerracotta,
+    color: COLORS.terracotta,
     fontSize: 16,
   },
   contentWrapper: {

@@ -106,7 +106,7 @@ export default function RateAppScreen() {
                 onPress={() => handleRate(index)}
                 style={({ pressed }) => [
                   styles.starBtn,
-                  pressed && { scale: 0.9 }
+                  pressed && { transform: [{ scale: 0.9 }] }
                 ]}
               >
                 <MotiView

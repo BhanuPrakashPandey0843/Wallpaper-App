@@ -1,50 +1,44 @@
-import React, { useCallback } from 'react';
-import { View, StyleSheet, Text, Pressable } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { MaterialCommunityIcons, Entypo, FontAwesome5 } from '@expo/vector-icons';
 import { MotiView } from 'moti';
 import * as Haptics from 'expo-haptics';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { spacing } from '../../../theme/spacing';
+import { radius } from '../../../theme/radius';
+import Text from '../../../components/ui/Text';
 
 const CATEGORIES = [
   {
     id: 'prophets',
     title: 'Prophets',
-    color: '#B8F28C',
     iconName: 'star-four-points',
     IconLib: MaterialCommunityIcons,
-    iconColor: '#4A7C2C',
-    iconSize: 26,
+    accent: '#FF7D33',
   },
   {
     id: 'sahaba',
     title: 'Sahaba',
-    color: '#8BE3B0',
     iconName: 'tree',
     IconLib: Entypo,
-    iconColor: '#2D6A4F',
-    iconSize: 24,
+    accent: '#FFA64D',
   },
   {
     id: 'morals',
     title: 'Morals',
-    color: '#F5A58D',
     iconName: 'hand-holding-heart',
     IconLib: FontAwesome5,
-    iconColor: '#A65D45',
-    iconSize: 20,
+    accent: '#FFB450',
   },
   {
     id: 'heroes',
     title: 'Heroes',
-    color: '#B8B6F5',
     iconName: 'user-ninja',
     IconLib: FontAwesome5,
-    iconColor: '#483D8B',
-    iconSize: 20,
+    accent: '#FF8C46',
   },
 ];
 
-// Moving CategoryItem to a separate component for cleaner state management
 const CategoryItem = React.memo(({ item, onSelect, index }: { item: any, onSelect: (id: string) => void, index: number }) => {
   const scale = useSharedValue(1);
   const Icon = item.IconLib;
@@ -54,41 +48,32 @@ const CategoryItem = React.memo(({ item, onSelect, index }: { item: any, onSelec
   }));
 
   const onPressIn = () => {
-    scale.value = withSpring(0.92, { damping: 10 });
+    scale.value = withSpring(0.92, { damping: 15 });
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const onPressOut = () => {
-    scale.value = withSpring(1, { damping: 10 });
+    scale.value = withSpring(1, { damping: 15 });
   };
 
   return (
     <MotiView
-      from={{ opacity: 0, translateY: 20 }}
+      from={{ opacity: 0, translateY: 15 }}
       animate={{ opacity: 1, translateY: 0 }}
-      transition={{
-        type: 'timing',
-        duration: 500,
-        delay: index * 80,
-      }}
+      transition={{ type: 'timing', duration: 600, delay: 500 + index * 100 }}
+      style={styles.itemWrapper}
     >
       <Pressable 
         onPress={() => onSelect(item.id)} 
         onPressIn={onPressIn}
         onPressOut={onPressOut}
-        style={styles.categoryItem}
+        style={styles.pressable}
       >
         <Animated.View style={[styles.itemContent, animatedStyle]}>
-          <View style={styles.iconContainer}>
-            <Icon name={item.iconName as any} size={item.iconSize} color={item.iconColor} />
+          <View style={[styles.iconContainer, { backgroundColor: `${item.accent}15` }]}>
+            <Icon name={item.iconName as any} size={22} color={item.accent} />
           </View>
-
-          <View style={styles.shapeWrapper}>
-            <View style={styles.uDip} />
-            <View style={[styles.semiCircle, { backgroundColor: item.color }]}>
-              <Text style={styles.title}>{item.title}</Text>
-            </View>
-          </View>
+          <Text variant="xs" bold style={styles.title}>{item.title}</Text>
         </Animated.View>
       </Pressable>
     </MotiView>
@@ -99,100 +84,46 @@ interface Props {
   onSelect: (id: string) => void;
 }
 
-export const CategoriesSection: React.FC<Props> = React.memo(({ onSelect }) => {
+export const CategoriesSection: React.FC<Props> = ({ onSelect }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Story Categories</Text>
-
-      <View style={styles.row}>
-        {CATEGORIES.map((item, index) => (
-          <CategoryItem 
-            key={item.id} 
-            item={item} 
-            onSelect={onSelect} 
-            index={index} 
-          />
-        ))}
-      </View>
+      {CATEGORIES.map((cat, i) => (
+        <CategoryItem key={cat.id} item={cat} onSelect={onSelect} index={i} />
+      ))}
     </View>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#0F0F0F',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-  },
-  header: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#EAEAEA',
-    marginBottom: 24,
-    textAlign: 'left',
-  },
-  row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.xl,
   },
-  categoryItem: {
-    width: 78,
+  itemWrapper: {
+    alignItems: 'center',
+  },
+  pressable: {
+    alignItems: 'center',
   },
   itemContent: {
     alignItems: 'center',
+    gap: 8,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    backgroundColor: '#1C1C1E',
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: -16,
-    zIndex: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 6,
-  },
-  shapeWrapper: {
-    width: 78,
-    height: 60,
-    alignItems: 'center',
-  },
-  semiCircle: {
-    width: 78,
-    height: 60,
-    borderRadius: 28,
-    borderBottomLeftRadius: 36,
-    borderBottomRightRadius: 36,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    paddingBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.18,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  uDip: {
-    position: 'absolute',
-    top: -7,
-    width: 28,
-    height: 14,
-    borderRadius: 14,
-    backgroundColor: '#0F0F0F',
-    zIndex: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   title: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#2D2D2D',
-    textAlign: 'center',
+    color: '#FFF',
+    fontSize: 11,
+    opacity: 0.7,
+    letterSpacing: 0.5,
   },
 });
-
-export default CategoriesSection;

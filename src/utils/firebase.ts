@@ -1,33 +1,33 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, Auth, initializeAuth } from 'firebase/auth';
+import { getAuth, Auth, initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
-import Constants from 'expo-constants';
+import { getStorage } from 'firebase/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const extra = Constants.expoConfig?.extra ?? {};
 const firebaseConfig = {
-  apiKey: String(extra.firebaseApiKey ?? ''),
-  authDomain: String(extra.firebaseAuthDomain ?? ''),
-  projectId: String(extra.firebaseProjectId ?? ''),
-  storageBucket: String(extra.firebaseStorageBucket ?? ''),
-  messagingSenderId: String(extra.firebaseMessagingSenderId ?? ''),
-  appId: String(extra.firebaseAppId ?? ''),
+  apiKey: 'AIzaSyADSJhSL-mUkh_HsHr6r0InrPxoxMo7QPU',
+  authDomain: 'wallpaper-c74a3.firebaseapp.com',
+  projectId: 'wallpaper-c74a3',
+  storageBucket: 'wallpaper-c74a3.appspot.com',
+  messagingSenderId: '704605252889',
+  appId: '1:704605252889:web:fd7d4f666da70d2aeda988',
+  measurementId: 'G-CL5K9HN0NL',
 };
 
-const hasValidFirebaseConfig = Object.values(firebaseConfig).every((value) => Boolean(value && value !== 'undefined'));
-const app = hasValidFirebaseConfig ? (!getApps().length ? initializeApp(firebaseConfig) : getApp()) : null;
+// Prevent duplicate initialization
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-let auth: Auth | null = null;
-if (app) {
-  try {
-    auth = initializeAuth(app);
-  } catch {
-    auth = getAuth(app);
-  }
+// Auth with AsyncStorage persistence for React Native
+let auth: Auth;
+try {
+  auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage),
+  });
+} catch (error: any) {
+  auth = getAuth(app);
 }
 
-let db: Firestore | null = null;
-if (app) {
-  db = getFirestore(app);
-}
+const db: Firestore = getFirestore(app);
+const storage = getStorage(app);
 
-export { app, auth, db };
+export { app, auth, db, storage };

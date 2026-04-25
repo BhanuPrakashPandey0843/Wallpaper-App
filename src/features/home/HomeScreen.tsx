@@ -1,18 +1,19 @@
 import React, { useCallback } from 'react';
-import { View, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, StyleSheet, ScrollView, StatusBar } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { spacing } from '../../theme/spacing';
 import { colors } from '../../theme/colors';
-import { AppHeader } from '../../components/layout/AppHeader/AppHeader';
-import { SearchBar } from '../../components/composites/SearchBar';
+import { HomeHeader } from './components/HomeHeader';
+import { VerseOfTheDay } from './components/VerseOfTheDay';
 import { CategoriesSection } from './components/CategoriesSection';
 import { ProphetStoriesSection } from './components/ProphetStoriesSection';
 import ProphetReelsSection from './components/ProphetReelsSection';
+import { AnimatedBackground } from '../../components/ui/AnimatedBackground';
 import { useRouter } from 'expo-router';
 import { useGetProphetStoriesQuery, useGetProphetReelsQuery } from '../../store/api/storiesApi';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const pattern = require('../../../assets/pattern.png');
 
   const { data: prophetStories = [] } = useGetProphetStoriesQuery();
   const { data: prophetReels = [] } = useGetProphetReelsQuery();
@@ -46,41 +47,45 @@ export default function HomeScreen() {
       pathname: `/reel/${id}`,
       params: { 
         title: reel?.title,
-        // Since we can't easily pass a require() through params, 
-        // the detail screen should probably fetch or have its own mapping.
       }
     });
   }, [router, prophetReels]);
 
-  const onSearch = useCallback((q: string) => {}, []);
+  const onSearchPress = useCallback(() => {
+    // Navigate to search or open modal
+  }, []);
+
+  const onProfilePress = useCallback(() => {
+    router.push('/settings-view/account');
+  }, [router]);
 
   return (
     <View style={styles.container}>
-      {/* Background Pattern */}
-      <View style={styles.patternWrap} pointerEvents="none">
-        <Image source={pattern} style={styles.pattern} resizeMode="repeat" />
-      </View>
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+      
+      {/* Premium Animated Background */}
+      <AnimatedBackground />
 
-      <AppHeader />
-      <ScrollView 
+      <HomeHeader onSearchPress={onSearchPress} onProfilePress={onProfilePress} />
+
+      <Animated.ScrollView 
         style={styles.scroll} 
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
+        entering={FadeIn.duration(800)}
       >
-        <SearchBar style={styles.search} onSearch={onSearch} />
+        {/* Featured Hero Section */}
+        <VerseOfTheDay />
         
-        <View style={styles.sectionContainer}>
-          <CategoriesSection onSelect={onCategorySelect} />
-        </View>
+        {/* Categories Chips */}
+        <CategoriesSection onSelect={onCategorySelect} />
 
-        <View style={styles.sectionContainer}>
-          <ProphetStoriesSection stories={prophetStories} onOpen={onOpenStory} />
-        </View>
+        {/* Stories Section */}
+        <ProphetStoriesSection stories={prophetStories} onOpen={onOpenStory} />
 
-        <View style={styles.sectionContainer}>
-          <ProphetReelsSection reels={prophetReels} onOpen={onOpenReel} />
-        </View>
-      </ScrollView>
+        {/* Reels Section */}
+        <ProphetReelsSection reels={prophetReels} onOpen={onOpenReel} />
+      </Animated.ScrollView>
     </View>
   );
 }
@@ -88,27 +93,12 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-  },
-  patternWrap: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.03,
-  },
-  pattern: {
-    width: '100%',
-    height: '100%',
+    backgroundColor: '#050505',
   },
   scroll: {
     flex: 1,
   },
   content: {
-    paddingTop: spacing.md,
-    paddingBottom: 120, // Increased to prevent bottom nav overlap
-  },
-  search: {
-    marginBottom: spacing.lg,
-  },
-  sectionContainer: {
-    marginBottom: spacing.md,
+    paddingBottom: 120,
   },
 });

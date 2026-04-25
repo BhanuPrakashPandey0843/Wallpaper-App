@@ -7,5 +7,7 @@ export const typography = {
     md: 16,
     lg: 18,
     xl: 22,
+    xxl: 28,
+    xxxl: 34,
   },
 };

@@ -2,17 +2,19 @@ import React, { useCallback } from 'react';
 import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { SectionHeader } from '../../../components/composites/SectionHeader';
-import { WavyCurve } from '../../../components/ui/WavyCurve';
 import { spacing } from '../../../theme/spacing';
+import { radius } from '../../../theme/radius';
 import { colors } from '../../../theme/colors';
 import Text from '../../../components/ui/Text';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = SCREEN_WIDTH * 0.75;
-const CARD_HEIGHT = 200;
+const CARD_WIDTH = SCREEN_WIDTH * 0.45;
+const CARD_HEIGHT = CARD_WIDTH * 1.4;
 
 interface Story {
   id: string;
@@ -26,19 +28,19 @@ interface Props {
   loading?: boolean;
 }
 
-const ProphetCard = React.memo(({ item, onPress }: { item: Story; onPress: () => void }) => {
+const ProphetCard = React.memo(({ item, onPress, index }: { item: Story; onPress: () => void; index: number }) => {
   const scale = useSharedValue(1);
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }]
   }));
 
   const onPressIn = () => {
-    scale.value = withSpring(0.96, { damping: 10 });
+    scale.value = withSpring(0.96, { damping: 15 });
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const onPressOut = () => {
-    scale.value = withSpring(1, { damping: 10 });
+    scale.value = withSpring(1, { damping: 15 });
   };
 
   return (
@@ -49,37 +51,46 @@ const ProphetCard = React.memo(({ item, onPress }: { item: Story; onPress: () =>
       style={styles.cardContainer}
     >
       <Animated.View style={[styles.cardContent, animatedStyle]}>
-        <View style={styles.imageWrapper}>
-          <Image
-            source={item.image}
-            contentFit="cover"
-            style={styles.image}
-            transition={300}
-          />
-          <WavyCurve width={CARD_WIDTH} height={40} color={colors.background} />
-        </View>
-        <Text variant="sm" bold style={styles.cardTitle}>
-          {item.title}
-        </Text>
+        <Image
+          source={item.image}
+          contentFit="cover"
+          style={styles.image}
+          transition={400}
+        />
+        
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.8)']}
+          style={StyleSheet.absoluteFill}
+        />
+
+        <BlurView intensity={10} tint="dark" style={styles.textOverlay}>
+          <Text variant="xs" bold style={styles.cardTitle} numberOfLines={2}>
+            {item.title}
+          </Text>
+        </BlurView>
+
+        <View style={styles.rimLight} />
       </Animated.View>
     </Pressable>
   );
 });
 
 export const ProphetStoriesSection: React.FC<Props> = React.memo(({ stories, onOpen, loading }) => {
-  const renderItem = useCallback(({ item }: { item: Story }) => {
-    return <ProphetCard item={item} onPress={() => onOpen(item.id)} />;
+  const renderItem = useCallback(({ item, index }: { item: Story, index: number }) => {
+    return <ProphetCard item={item} onPress={() => onOpen(item.id)} index={index} />;
   }, [onOpen]);
 
   const keyExtractor = useCallback((item: Story) => item.id, []);
 
   return (
     <View style={styles.container}>
-      <SectionHeader title="Prophet Stories" />
+      <View style={styles.headerContainer}>
+        <SectionHeader title="Spiritual Stories" />
+      </View>
       {loading ? (
         <View style={styles.content}>
           {Array.from({ length: 3 }).map((_, i) => (
-            <View key={`ps-skeleton-${i}`} style={styles.skeleton} />
+            <View key={`ps-skeleton-${i}`} style={[styles.skeleton, { width: CARD_WIDTH, height: CARD_HEIGHT }]} />
           ))}
         </View>
       ) : (
@@ -90,9 +101,8 @@ export const ProphetStoriesSection: React.FC<Props> = React.memo(({ stories, onO
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.content}
-          snapToInterval={CARD_WIDTH + spacing.md}
+          estimatedItemSize={CARD_WIDTH}
           decelerationRate="fast"
-          snapToAlignment="start"
         />
       )}
     </View>
@@ -101,49 +111,58 @@ export const ProphetStoriesSection: React.FC<Props> = React.memo(({ stories, onO
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: spacing.md,
+    marginBottom: spacing.xl,
+  },
+  headerContainer: {
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
   },
   content: {
-    paddingHorizontal: spacing.md,
+    paddingLeft: spacing.lg,
+    paddingRight: spacing.md,
   },
   cardContainer: {
     width: CARD_WIDTH,
+    height: CARD_HEIGHT,
     marginRight: spacing.md,
+    borderRadius: radius.lg,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   cardContent: {
-    width: '100%',
-  },
-  imageWrapper: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    borderRadius: 32,
-    overflow: 'hidden',
-    backgroundColor: colors.surfaceElevated,
-    position: 'relative',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    flex: 1,
   },
   image: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 32,
+    ...StyleSheet.absoluteFillObject,
+  },
+  textOverlay: {
+    position: 'absolute',
+    bottom: spacing.sm,
+    left: spacing.sm,
+    right: spacing.sm,
+    padding: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   cardTitle: {
-    marginTop: 10,
-    color: colors.textPrimary,
-    paddingHorizontal: 4,
+    color: '#FFF',
+    fontSize: 12,
+    letterSpacing: 0.2,
+  },
+  rimLight: {
+    ...StyleSheet.absoluteFillObject,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: radius.lg,
+    pointerEvents: 'none',
   },
   skeleton: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
+    borderRadius: radius.lg,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     marginRight: spacing.md,
-    borderRadius: 32,
-    backgroundColor: colors.surfaceElevated,
   },
 });
-
-export default ProphetStoriesSection;
